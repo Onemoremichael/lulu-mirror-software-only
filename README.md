@@ -42,6 +42,8 @@ Follow [the recovery guide](docs/RECOVERY.md),
 [hardware compatibility](docs/COMPATIBILITY.md) and
 [what is verified](docs/STATUS.md). Existing Android installations should start
 with verification and remote control, without reflashing.
+Use the [owner acceptance checklist](docs/ACCEPTANCE.md) to distinguish automated
+Android checks from actual display, Wi-Fi, audio and camera tests.
 
 ```sh
 # Once Android ADB is authorized:
