@@ -8,6 +8,8 @@ from .device import RecoveryError, devices, inspect
 from .artifacts import create_bundle, write_json
 from .flash import plan, execute
 from .verify import verify
+from .remote import serve
+from .setup import configure
 
 
 def main(argv=None):
@@ -19,6 +21,15 @@ def main(argv=None):
     p.add_argument('--serial', required=True)
     p.add_argument('--board', required=True, choices=['mir63a0-revp21'])
     p.add_argument('--output', type=Path)
+    p = sub.add_parser('configure', help='Finish Android setup and set the measured panel orientation')
+    p.add_argument('--serial', required=True)
+    p.add_argument('--board', required=True, choices=['mir63a0-revp21'])
+    p.add_argument('--orientation', choices=['portrait', 'landscape'], default='portrait')
+    p = sub.add_parser('remote', help='Start non-touch Android navigation and screen preview')
+    p.add_argument('--serial', required=True)
+    p.add_argument('--board', required=True, choices=['mir63a0-revp21'])
+    p.add_argument('--host', default='127.0.0.1', help='Explicit private IPv4 address; default computer only')
+    p.add_argument('--port', type=int, default=8765)
     p = sub.add_parser('bundle', help='Validate and describe locally supplied firmware')
     p.add_argument('--board', required=True, choices=['mir63a0-revp21'])
     p.add_argument('--system', type=Path, required=True)
@@ -54,6 +65,11 @@ def main(argv=None):
             result = plan(args.serial, args.board, args.bundle)
         elif args.command == 'flash':
             result = execute(args.plan, args.confirm, args.journal)
+        elif args.command == 'configure':
+            result = configure(args.serial, args.board, args.orientation)
+        elif args.command == 'remote':
+            serve(args.serial, args.board, args.host, args.port)
+            return 0
         else:
             result = verify(args.serial, args.board)
         output = json.dumps(result, indent=2) + '\n'

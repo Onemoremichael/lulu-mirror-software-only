@@ -40,6 +40,22 @@ Follow [the recovery guide](docs/RECOVERY.md),
 [what is verified](docs/STATUS.md). Existing Android installations should start
 with verification and remote control, without reflashing.
 
+```sh
+# Once Android ADB is authorized:
+python3 mirror.py configure --serial YOUR_SERIAL --board mir63a0-revp21
+python3 mirror.py remote --serial YOUR_SERIAL --board mir63a0-revp21
+```
+
+Open the printed remote address for screen preview, Back/Home, directional
+navigation, Wi-Fi setup, text entry, volume and wake/sleep. See
+[computer and phone controls](docs/REMOTE.md). The remote defaults to this
+computer; phone access requires an explicit trusted-LAN bind address.
+
+For a new installation, the guided sequence is **inspect → build → bundle →
+plan → flash → configure → verify**. The recovery guide gives the exact commands
+and explains which steps replace data. Images and partition geometry are checked
+before a serial-specific plan can be executed.
+
 ## Development
 
 ```sh
