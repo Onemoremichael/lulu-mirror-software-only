@@ -1,0 +1,17 @@
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+.work/
+artifacts/
+reports/
+bundles/
+*.img
+*.sparse
+*.apk
+*.so
+*.ko
+*.key
+*.pem
+adbkey*
+.env
