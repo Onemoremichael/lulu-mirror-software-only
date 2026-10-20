@@ -15,8 +15,6 @@ class DeviceTests(unittest.TestCase):
 
     def test_serial_rejects_command_injection(self):
         for value in ['-s', 'x;reboot', 'a b', '', '$(whoami)']:
-            if value == '-s':
-                continue  # Passed as the argument to -s, never interpreted as an option.
             with self.assertRaises(RecoveryError):
                 validate_serial(value)
 
