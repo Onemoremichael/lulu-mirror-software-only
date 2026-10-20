@@ -5,9 +5,18 @@ import runpy
 import tempfile
 import unittest
 from build.prepare import fingerprint
+from build.resources import docker_build_command
 
 
 class BuildInputTests(unittest.TestCase):
+    def test_builds_share_exclusive_name_and_resource_limits(self):
+        command = docker_build_command()
+        for flag, expected in [('--name', 'lulu-android-build'), ('--cpus', '2'),
+                               ('--memory', '4g'), ('--memory-swap', '4g'),
+                               ('--pids-limit', '1024'), ('--restart', 'no')]:
+            self.assertEqual(command[command.index(flag) + 1], expected)
+        self.assertIn('--rm', command)
+
     def test_owner_fingerprint_matches_android_format(self):
         with tempfile.TemporaryDirectory() as temp:
             key = Path(temp) / 'adbkey.pub'

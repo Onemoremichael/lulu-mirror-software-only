@@ -49,6 +49,12 @@ toolchain environment; it is not a substitute for these vendor inputs.
 
 The host needs Python 3.10+ and Docker. The container uses its existing Python 2.7
 for legacy Android preparation; `build/prepare.py` supports both interpreters.
+The build container is capped at two CPU cores, 4 GiB RAM, no additional swap,
+and 1,024 processes. Compilation defaults to two jobs. Its fixed container name
+prevents two copies of this builder from running together; do not run the
+separate camera builder concurrently. These limits reduce host pressure, but
+cannot guarantee Docker stability. An out-of-memory failure stops the build;
+there is no automatic restart or retry.
 Build against a disposable source checkout:
 
 ```sh

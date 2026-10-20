@@ -11,6 +11,7 @@ import subprocess
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from build.prepare import fingerprint
+from build.resources import docker_build_command
 from recovery.artifacts import image_info, sha256, write_json
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ def main():
     p.add_argument('--work-image', type=Path, help='New path for a clone of --legacy-image')
     p.add_argument('--public-key', type=Path, required=True)
     p.add_argument('--output-dir', type=Path, required=True)
-    p.add_argument('--jobs', type=int, default=4)
+    p.add_argument('--jobs', type=int, default=2)
     args = p.parse_args()
     key = args.public_key.resolve(strict=True)
     if key.suffix != '.pub':
@@ -38,7 +39,7 @@ def main():
     output = args.output_dir.resolve()
     if output.exists():
         p.error('Choose a new output directory so previous build logs/artifacts are preserved.')
-    command = ['docker', 'run', '--rm', '--platform', 'linux/amd64',
+    command = docker_build_command() + [
                '-e', f'BUILD_JOBS={args.jobs}', '-v', f'{ROOT / "build"}:/inputs:ro',
                '-v', f'{key}:/owner.pub:ro', '-v', f'{output}:/artifacts']
     if args.legacy_image or args.resume_image:

@@ -69,12 +69,7 @@ out/host/linux-x86/bin/simg2img /artifacts/system.img /artifacts/system.raw.img
 mkdir -p /inspect
 mount -o loop,ro /artifacts/system.raw.img /inspect
 trap 'umount /inspect; cleanup' EXIT
-grep -qx 'service.adb.tcp.port=-1' /inspect/build.prop
-grep -qx 'ro.mirror.software_only=1' /inspect/build.prop
-test -s /inspect/app/Launcher3/Launcher3.apk
-test -s /inspect/lib/modules/pronto/pronto_wlan.ko
-test ! -e /inspect/lib/modules/mirror_camera_diag.ko
-test ! -e /inspect/vendor/lib/libMD2.so
+source /inputs/inspect-system.sh
 umount /inspect
 trap cleanup EXIT
 rm -f /artifacts/system.raw.img
