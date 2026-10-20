@@ -1,0 +1,12 @@
+{
+  "id": "mir63a0-revp21",
+  "board_label": "MIR63A0-00-P1 / PCA#500240 RevP21",
+  "platforms": ["msm8916"],
+  "fastboot_products": ["MSM8916"],
+  "android_release": "6.0.1",
+  "kernel_release": "3.10.49-perf-gf46dad5260f",
+  "writable_partitions": ["system", "userdata"],
+  "preserved_partitions": ["boot", "recovery", "aboot", "sbl1", "tz", "rpm", "modem", "persist", "fsg", "gpt"],
+  "evidence": "One owner's board; September 2026 recovery logs in mirror-mirror.",
+  "status": "single-unit-verified; requires physical board-label confirmation"
+}
