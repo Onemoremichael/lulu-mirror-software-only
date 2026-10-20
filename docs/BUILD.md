@@ -80,6 +80,12 @@ full physical copy. Docker needs privileged loop mounts for an ext4 image.
 `build.log` records compilation progress; `build-report.json` and `SHA256SUMS`
 identify successful output. `system.img` is the only firmware image exported.
 Building never invokes ADB or fastboot.
+Each new invocation freezes its recipes and owner public key under the ignored
+output directory's `inputs/`, and writes `input-hashes.json` before starting
+Docker. Editing the repository then cannot alter that invocation's recipes.
+Only the public key is copied, never the owner's private ADB key. Preserve the
+input hashes with the build log when investigating a failure. Builds started
+before this snapshot feature still use their original live recipe mounts.
 
 If an interrupted job left a disposable cloned working image, retain its logs
 and resume that copy into a new output directory:

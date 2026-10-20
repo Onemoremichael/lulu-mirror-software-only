@@ -12,6 +12,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from build.prepare import fingerprint
 from build.resources import docker_build_command
+from build.inputs import snapshot
 from recovery.artifacts import image_info, sha256, write_json
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -40,8 +41,7 @@ def main():
     if output.exists():
         p.error('Choose a new output directory so previous build logs/artifacts are preserved.')
     command = docker_build_command() + [
-               '-e', f'BUILD_JOBS={args.jobs}', '-v', f'{ROOT / "build"}:/inputs:ro',
-               '-v', f'{key}:/owner.pub:ro', '-v', f'{output}:/artifacts']
+               '-e', f'BUILD_JOBS={args.jobs}', '-v', f'{output}:/artifacts']
     if args.legacy_image or args.resume_image:
         original = args.legacy_image.resolve(strict=True) if args.legacy_image else None
         if args.resume_image:
@@ -77,8 +77,18 @@ def main():
         tree = args.tree.resolve(strict=True)
         command += ['--privileged', '-v', f'{tree}:/source']
         source_kind = 'owner-supplied source checkout; verify against build/manifest.xml'
-    command += [CONTAINER, 'bash', '/inputs/container-build.sh']
     output.mkdir(parents=True, exist_ok=False)
+    inputs, unused_camera = snapshot(ROOT, output)
+    frozen_key = inputs / 'owner.pub'
+    shutil.copyfile(key, frozen_key)
+    if hashlib.sha256(base64.b64decode(frozen_key.read_text().split()[0])).hexdigest() != owner_key_hash:
+        raise ValueError('Owner public key changed while preparing build inputs.')
+    input_hashes = {str(path.relative_to(inputs)): sha256(path)
+                    for path in sorted(inputs.rglob('*')) if path.is_file()}
+    write_json(output / 'input-hashes.json', input_hashes)
+    command += ['-v', f'{inputs / "build"}:/inputs:ro',
+                '-v', f'{frozen_key}:/owner.pub:ro',
+                CONTAINER, 'bash', '/inputs/container-build.sh']
     print('Building Android; follow the log in ' + str(output / 'build.log'), flush=True)
     with (output / 'build.log').open('x') as log:
         result = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT)
@@ -88,6 +98,7 @@ def main():
     report = {'schema': 1, 'profile': 'mir63a0-revp21', 'container': CONTAINER,
               'source_kind': source_kind, 'image': image_info(image), 'sha256': sha256(image),
               'owner_public_key_sha256': owner_key_hash, 'hardware_verified': False,
+              'input_hashes': input_hashes,
               'camera': 'Generic vendor stack only; camera recovery is not included in this baseline.'}
     write_json(output / 'build-report.json', report)
     print(json.dumps(report, indent=2))
