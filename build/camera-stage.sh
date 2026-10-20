@@ -2,7 +2,6 @@
 # The native camera artifacts were compiled/hash-checked by tools/build-camera.py.
 prepare_camera_sources() {
   python /inputs/prepare-camera.py --tree "$tree" --patches /camera-patches
-  make -j"${BUILD_JOBS:-4}" camera.msm8916_32 libstagefright libstagefright_32 SnapdragonCamera
 }
 
 install_camera_artifacts() {

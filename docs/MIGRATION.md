@@ -14,8 +14,9 @@ experiments. Work is committed, pushed and merged in reviewable passes.
 | Non-touch Android setup and control | Configure command and working remote controls | Implemented; HTTP tests passed; hardware acceptance pending |
 | Reproducible Android build | Pinned inputs, successful build and clean-checkout validation | Pinned sources/recipes extracted; legacy-workspace build under test |
 | Wi-Fi/audio/camera parity | Physical acceptance with resulting image | Original research evidence exists; new baseline not yet accepted |
-| Camera compatibility extraction | Minimal native code, source patches, ABI and buffer-safety checks | Extracted and host/native-tested; full image integration pending |
+| Camera compatibility extraction | Minimal native code, source patches, ABI and buffer-safety checks | Extracted and host/native-tested; integrated image build under test |
 | Upstream repo pivot | Main README and ownership links point to new recovery repo | mirror-mirror PR #10 merged |
+| Assistant/platform boundary | Looking Glass points recovery to the dedicated repo, without moving its optional wrapper | Looking Glass PR #25 merged; unrelated local app changes preserved |
 | Public firmware distribution | Provenance/license review and verified release artifacts | Pending; no release published |
 | Second-owner onboarding | Matching board recovers from published instructions | Pending |
 | Each pass pushed and merged | PR merge state plus detailed validation | New repo PRs #1–3 and mirror-mirror PR #10 merged; build pass in progress |

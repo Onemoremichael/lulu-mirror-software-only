@@ -28,6 +28,8 @@ def main():
     p.add_argument('--work-image', type=Path, help='New path for a clone of --legacy-image')
     p.add_argument('--public-key', type=Path, required=True)
     p.add_argument('--output-dir', type=Path, required=True)
+    p.add_argument('--camera-artifacts', type=Path,
+                   help='Hash-validated output directory from tools/build-camera.py')
     p.add_argument('--jobs', type=int, default=2)
     args = p.parse_args()
     key = args.public_key.resolve(strict=True)
@@ -78,7 +80,7 @@ def main():
         command += ['--privileged', '-v', f'{tree}:/source']
         source_kind = 'owner-supplied source checkout; verify against build/manifest.xml'
     output.mkdir(parents=True, exist_ok=False)
-    inputs, unused_camera = snapshot(ROOT, output)
+    inputs, camera_report = snapshot(ROOT, output, args.camera_artifacts)
     frozen_key = inputs / 'owner.pub'
     shutil.copyfile(key, frozen_key)
     if hashlib.sha256(base64.b64decode(frozen_key.read_text().split()[0])).hexdigest() != owner_key_hash:
@@ -87,8 +89,12 @@ def main():
                     for path in sorted(inputs.rglob('*')) if path.is_file()}
     write_json(output / 'input-hashes.json', input_hashes)
     command += ['-v', f'{inputs / "build"}:/inputs:ro',
-                '-v', f'{frozen_key}:/owner.pub:ro',
-                CONTAINER, 'bash', '/inputs/container-build.sh']
+                '-v', f'{frozen_key}:/owner.pub:ro']
+    if camera_report:
+        command += ['-e', 'CAMERA_ENABLED=1',
+                    '-v', f'{inputs / "camera-artifacts"}:/camera-artifacts:ro',
+                    '-v', f'{inputs / "camera-patches"}:/camera-patches:ro']
+    command += [CONTAINER, 'bash', '/inputs/container-build.sh']
     print('Building Android; follow the log in ' + str(output / 'build.log'), flush=True)
     with (output / 'build.log').open('x') as log:
         result = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT)
@@ -99,7 +105,7 @@ def main():
               'source_kind': source_kind, 'image': image_info(image), 'sha256': sha256(image),
               'owner_public_key_sha256': owner_key_hash, 'hardware_verified': False,
               'input_hashes': input_hashes,
-              'camera': 'Generic vendor stack only; camera recovery is not included in this baseline.'}
+              'camera': camera_report or 'Generic vendor stack only; camera recovery is not included in this baseline.'}
     write_json(output / 'build-report.json', report)
     print(json.dumps(report, indent=2))
 

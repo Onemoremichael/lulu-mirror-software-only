@@ -42,3 +42,10 @@ the disposable Android working copy was resumed, capped at two CPU cores and
 now share an exclusive container name. The earlier logs and original source
 image were preserved. The crash cause has not been established; resource limits
 reduce pressure but are not proof of a Docker stability fix.
+
+The first capped attempt stopped with truncated/zero-length objects in Android's
+secondary generic kernel output, not another Docker crash. The stock-compatible
+kernel and Wi-Fi build succeeded. The recipe now explicitly exports headers and
+reuses that completed kernel for Android's internal dependency, rather than
+building a second unused generic kernel. The integrated camera image is being
+built from the disposable working copy with the same limits and frozen inputs.

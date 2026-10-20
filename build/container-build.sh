@@ -39,8 +39,24 @@ set +u
 source build/envsetup.sh
 lunch msm8916_64-userdebug
 set -u
-make -j"${BUILD_JOBS:-4}" systemimage
 product=out/target/product/msm8916_64
+# Only system is exported. Reuse the compatibility build for Android's internal
+# kernel dependency instead of rebuilding an unrelated generic kernel. Export
+# headers explicitly because AndroidKernel.mk skips them for a prebuilt kernel.
+make -C kernel O="$kernel_out" ARCH=arm64 CROSS_COMPILE="$cross" headers_install \
+  INSTALL_HDR_PATH="$tree/$product/obj/KERNEL_OBJ/usr"
+android_make() {
+  make -j"${BUILD_JOBS:-2}" \
+    TARGET_PREBUILT_KERNEL="$kernel_out/arch/arm64/boot/Image.gz-dtb" \
+    KERNEL_HEADERS_INSTALL="$tree/$product/obj/KERNEL_OBJ/usr" "$@"
+}
+camera_targets=()
+if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then
+  source /inputs/camera-stage.sh
+  prepare_camera_sources
+  camera_targets=(camera.msm8916_32 libstagefright libstagefright_32 SnapdragonCamera)
+fi
+android_make systemimage "${camera_targets[@]}"
 install -m 0644 "$wlan/wlan.ko" "$product/system/lib/modules/pronto/pronto_wlan.ko"
 # The original product doesn't include the camera media controller modules in its
 # package list; retain the vendor components needed by its installed daemon.
@@ -58,7 +74,8 @@ done
 rm -f "$product/system/lib/modules/mirror_camera_diag.ko" "$product/system/vendor/lib/libMD2.so"
 sed -i '/^persist.camera.*debug/d; /^debug.mirror./d; /^service.adb.tcp.port=/d; /^ro.mirror.software_only=/d' "$product/system/build.prop"
 printf '\nservice.adb.tcp.port=-1\nro.mirror.software_only=1\n' >> "$product/system/build.prop"
-make -j"${BUILD_JOBS:-4}" snod
+if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then install_camera_artifacts; fi
+android_make snod
 cp "$product/system.img" /artifacts/system.img
 cp "$wlan/wlan.ko" /artifacts/pronto_wlan.ko
 cp "$product/system/build.prop" /artifacts/build.prop
@@ -70,6 +87,7 @@ mkdir -p /inspect
 mount -o loop,ro /artifacts/system.raw.img /inspect
 trap 'umount /inspect; cleanup' EXIT
 source /inputs/inspect-system.sh
+if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then verify_camera_image; fi
 umount /inspect
 trap cleanup EXIT
 rm -f /artifacts/system.raw.img

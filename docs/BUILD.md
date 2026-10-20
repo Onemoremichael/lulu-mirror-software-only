@@ -59,19 +59,26 @@ Build against a disposable source checkout:
 
 ```sh
 python3 tools/build-system.py --tree /absolute/path/to/android-m \
-  --public-key "$HOME/.android/adbkey.pub" --output-dir artifacts/my-system
+  --public-key "$HOME/.android/adbkey.pub" --output-dir artifacts/my-system \
+  --camera-artifacts artifacts/my-camera
 ```
 
 The source tree must be on a Linux-compatible, case-sensitive filesystem. A Linux
 Docker volume or ext4 working image avoids macOS filesystem incompatibilities.
 The build modifies that workspace and compiler output; use a disposable copy.
+Prepare `artifacts/my-camera` first using the
+[camera build instructions](../camera/README.md). The native camera build and
+system build run sequentially under the same exclusive Docker name. Omit
+`--camera-artifacts` only for a diagnostic generic-camera build; that output is
+not the complete camera recovery baseline.
 
 For the existing ext4 legacy workspace, the tool makes a filesystem clone first:
 
 ```sh
 python3 tools/build-system.py --legacy-image /absolute/path/to/old-build.ext4.img \
   --work-image /absolute/path/to/new-working-build.img \
-  --public-key "$HOME/.android/adbkey.pub" --output-dir artifacts/my-system
+  --public-key "$HOME/.android/adbkey.pub" --output-dir artifacts/my-system \
+  --camera-artifacts artifacts/my-camera
 ```
 
 APFS cloning on macOS or reflink support on Linux is required for this path. The
@@ -92,7 +99,8 @@ and resume that copy into a new output directory:
 
 ```sh
 python3 tools/build-system.py --resume-image /absolute/path/to/new-working-build.img \
-  --public-key "$HOME/.android/adbkey.pub" --output-dir artifacts/my-system-retry
+  --public-key "$HOME/.android/adbkey.pub" --output-dir artifacts/my-system-retry \
+  --camera-artifacts artifacts/my-camera
 ```
 
 Use `--resume-image` only for the disposable working copy. It is modified in
@@ -105,12 +113,17 @@ its original kernel. The Wi-Fi module must match
 `3.10.49-perf-gf46dad5260f`. The Android patch supplies owner-key authorization,
 the userdata encryption-handoff fix, speaker routing and delayed WLAN loading.
 USB RSA authorization stays enabled; network ADB is disabled by default.
+Android's internal kernel dependency reuses that completed compatibility build;
+headers are exported explicitly. No replacement boot image is exported or flashed.
 
 The baseline does not add the camera lab's diagnostic kernel module, C2D sampler,
 exposure experiments, clock, assistant or dashboard. A clean generic vendor
-camera stack is **not** equivalent to the repaired research camera. Camera support
-must be migrated and measured before claiming parity with the original research
-image. A legacy workspace can retain camera source changes from that work; its
+camera stack is **not** equivalent to the repaired research camera. Supplying
+`--camera-artifacts` validates and freezes the four native camera files, applies
+the HAL/Snapcam/recording source fixes, builds both recording architectures, and
+checks installed files and metadata in the finished filesystem. Full integrated
+image compilation and hardware acceptance are still under test; this is not yet
+proof of camera parity. A legacy workspace can retain source changes from that work; its
 build report must not be described as a clean-source reproduction.
 
 Until a clean-source build, vendor provenance and device acceptance are verified,

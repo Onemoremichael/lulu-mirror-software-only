@@ -51,6 +51,22 @@ two-core/4 GiB limit, with no extra swap or automatic restart. Docker rejects a
 second builder while one is running. This is a host-stability precaution, not a
 guarantee that an emulated legacy toolchain cannot exhaust its own memory limit.
 
+Then supply this output to the system builder:
+
+```sh
+python3 tools/build-system.py --tree /absolute/path/to/disposable/android-m \
+  --public-key "$HOME/.android/adbkey.pub" --camera-artifacts artifacts/my-camera \
+  --output-dir artifacts/my-system
+```
+
+Use the image clone/resume options in [BUILD.md](../docs/BUILD.md) instead of
+`--tree` when appropriate. The builder validates the native report and copies
+only its four required binaries into an immutable per-build snapshot. It applies
+the HAL/Snapcam/recording source fixes, builds both recording architectures, then
+checks native file hashes, front/mount-0 metadata, buffer-bound guards and the
+camera APK in the final filesystem. This integrated path is under build test;
+none of these filesystem checks constitutes physical camera acceptance.
+
 Camera source preparation runs inside the pinned Linux environment with GNU
 patch. macOS BSD patch does not handle some of the historical one-line hunks the
 same way. Preparation stages the complete patch chain before updating source
