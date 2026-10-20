@@ -87,6 +87,11 @@ full physical copy. Docker needs privileged loop mounts for an ext4 image.
 `build.log` records compilation progress; `build-report.json` and `SHA256SUMS`
 identify successful output. `system.img` is the only firmware image exported.
 Building never invokes ADB or fastboot.
+The final read-only filesystem inspection also writes `elf-audit.json` and
+rejects shared objects whose ELF tables, file-backed sections or segments extend
+past the file. This is a truncation check, not proof of symbol resolution or
+hardware behavior. A failed build retains its log; no failed artifact is
+automatically deleted or retried.
 Each new invocation freezes its recipes and owner public key under the ignored
 output directory's `inputs/`, and writes `input-hashes.json` before starting
 Docker. Editing the repository then cannot alter that invocation's recipes.

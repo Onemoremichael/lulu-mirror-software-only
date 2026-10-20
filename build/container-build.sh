@@ -88,6 +88,7 @@ mount -o loop,ro /artifacts/system.raw.img /inspect
 trap 'umount /inspect; cleanup' EXIT
 source /inputs/inspect-system.sh
 if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then verify_camera_image; fi
+python /inputs/elf.py /inspect > /artifacts/elf-audit.json
 umount /inspect
 trap cleanup EXIT
 rm -f /artifacts/system.raw.img

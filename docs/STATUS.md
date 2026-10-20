@@ -49,3 +49,14 @@ kernel and Wi-Fi build succeeded. The recipe now explicitly exports headers and
 reuses that completed kernel for Android's internal dependency, rather than
 building a second unused generic kernel. The integrated camera image is being
 built from the disposable working copy with the same limits and frozen inputs.
+
+That integrated attempt then reached a malformed cached `libMcClient.so`: its
+section-header table extended beyond the packed file. A fresh relocation-packer
+run on its linked input completed without the earlier readelf error. Independent
+Python bounds checks confirmed the two malformed cached copies (PACKED and
+symbols); only those two files were moved into the working image's
+`.recovery-quarantine-20261020/` for recoverability. No source or vendor input
+was removed. Kernel `.o` audit results were not blindly cleaned: Kbuild also
+legitimately produces archive-format `built-in.o` files. The new final image
+gate checks ELF header tables, file-backed sections and segments and records
+`elf-audit.json`. This checks truncation, not full link/runtime correctness.
