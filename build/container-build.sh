@@ -45,11 +45,7 @@ product=out/target/product/msm8916_64
 # headers explicitly because AndroidKernel.mk skips them for a prebuilt kernel.
 make -C kernel O="$kernel_out" ARCH=arm64 CROSS_COMPILE="$cross" headers_install \
   INSTALL_HDR_PATH="$tree/$product/obj/KERNEL_OBJ/usr"
-android_make() {
-  make -j"${BUILD_JOBS:-2}" \
-    TARGET_PREBUILT_KERNEL="$kernel_out/arch/arm64/boot/Image.gz-dtb" \
-    KERNEL_HEADERS_INSTALL="$tree/$product/obj/KERNEL_OBJ/usr" "$@"
-}
+source /inputs/android-make.sh
 camera_targets=()
 if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then
   source /inputs/camera-stage.sh

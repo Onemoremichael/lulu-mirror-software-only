@@ -60,3 +60,12 @@ was removed. Kernel `.o` audit results were not blindly cleaned: Kbuild also
 legitimately produces archive-format `built-in.o` files. The new final image
 gate checks ELF header tables, file-backed sections and segments and records
 `elf-audit.json`. This checks truncation, not full link/runtime correctness.
+
+The repaired attempt regenerated the packed library, then exposed an integration
+gap: vendor DLKM rules expected `KERNEL_OUT`, which the prebuilt-kernel shortcut
+had not supplied. The make wrapper now supplies the relative prepared-kernel
+path/config, with a shell argument regression test. A targeted test reached the
+vendor bus-timeout fault-injection module but hit its own forbidden compiler
+warning. These generic kernel test modules are outside normal recovery operation;
+the vendor's `TARGET_KERNEL_DLKM_DISABLE` hook now disables them. The required
+stock-compatible Wi-Fi module remains an explicit, verified build/install step.

@@ -120,6 +120,10 @@ the userdata encryption-handoff fix, speaker routing and delayed WLAN loading.
 USB RSA authorization stays enabled; network ADB is disabled by default.
 Android's internal kernel dependency reuses that completed compatibility build;
 headers are exported explicitly. No replacement boot image is exported or flashed.
+The vendor DLKM build hook is disabled for generic test modules such as bus-timeout
+and BAM loopback; these are not required for normal Android operation. The required
+stock-compatible Wi-Fi module is still built and installed explicitly above that
+hook. This does not disable the original kernel's built-in display/camera drivers.
 
 The baseline does not add the camera lab's diagnostic kernel module, C2D sampler,
 exposure experiments, clock, assistant or dashboard. A clean generic vendor
