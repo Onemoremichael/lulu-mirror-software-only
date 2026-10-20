@@ -75,6 +75,19 @@ full physical copy. Docker needs privileged loop mounts for an ext4 image.
 identify successful output. `system.img` is the only firmware image exported.
 Building never invokes ADB or fastboot.
 
+If an interrupted job left a disposable cloned working image, retain its logs
+and resume that copy into a new output directory:
+
+```sh
+python3 tools/build-system.py --resume-image /absolute/path/to/new-working-build.img \
+  --public-key "$HOME/.android/adbkey.pub" --output-dir artifacts/my-system-retry
+```
+
+Use `--resume-image` only for the disposable working copy. It is modified in
+place. The tool checks actual live Docker mounts and refuses a workspace another
+job is using. A slow observation or a stale log is not enough to declare a build
+stopped; inspect its live container/process before retrying.
+
 The kernel is compiled to obtain compatible module symbols, but the device keeps
 its original kernel. The Wi-Fi module must match
 `3.10.49-perf-gf46dad5260f`. The Android patch supplies owner-key authorization,
