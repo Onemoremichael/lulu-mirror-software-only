@@ -31,7 +31,7 @@ def executable(name):
 
 
 def validate_serial(serial):
-    if not re.fullmatch(r'[A-Za-z0-9_.:\-]{1,150}', serial):
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.:\-]{0,149}', serial):
         raise RecoveryError('Invalid device serial.')
     return serial
 
