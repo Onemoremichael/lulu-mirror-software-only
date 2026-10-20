@@ -117,12 +117,14 @@ diff --git a/device/qcom/msm8916_32/mixer_paths_sbc.xml b/device/qcom/msm8916_32
  
      <path name="hdmi">
 diff --git a/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java b/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
+index 8a951fe..9a9d37a 100644
 --- a/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
 +++ b/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java
-@@ -385,5 +385,16 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
+@@ -383,6 +383,18 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
+     private static final int SUPPLICANT_RESTART_TRIES = 5;
  
      private int mSupplicantRestartCount = 0;
- 
++
 +    /**
 +     * The Mirror's WLAN device can appear several seconds after Android's
 +     * framework first asks to enable Wi-Fi. Keep the controller in its
@@ -136,14 +138,16 @@ diff --git a/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiSt
 +
      /* Tracks sequence number on stop failure message */
      private int mSupplicantStopFailureToken = 0;
-@@ -5994,5 +6004,6 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
+ 
+@@ -5992,6 +6004,7 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
              switch (message.what) {
                  case CMD_START_SUPPLICANT:
                      if (mWifiNative.loadDriver()) {
 +                        mDriverLoadRetryCount = 0;
                          try {
                              mNwService.wifiFirmwareReload(mInterfaceName, "STA");
-@@ -6045,10 +6056,26 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiRss
+                         } catch (Exception e) {
+@@ -6043,10 +6056,29 @@ public class WifiStateMachine extends StateMachine implements WifiNative.WifiPno
                              setWifiState(WifiManager.WIFI_STATE_FAILED);
                          }
                      } else {
@@ -165,10 +169,13 @@ diff --git a/frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiSt
 +                        }
                      }
                      break;
-                 case CMD_STOP_SUPPLICANT:
++                case CMD_STOP_SUPPLICANT:
 +                    // Cancel a pending delayed driver-load retry when Wi-Fi is
 +                    // deliberately switched off.
 +                    removeMessages(CMD_START_SUPPLICANT);
 +                    mDriverLoadRetryCount = 0;
-                     setWifiState(WifiManager.WIFI_STATE_DISABLED);
-                     break;
++                    setWifiState(WifiManager.WIFI_STATE_DISABLED);
++                    break;
+                 case CMD_START_AP:
+                     if (mWifiNative.loadDriver() == false) {
+                         loge("Failed to load driver for softap");

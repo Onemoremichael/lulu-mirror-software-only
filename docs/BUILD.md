@@ -1,8 +1,8 @@
 # Build inputs and redistribution
 
-The starting implementation comes from mirror-mirror commit history, including
-its Android revival patch, manifest rewrite, filesystem tools and kernel/Wi-Fi
-compatibility work. The migration will make the required inputs explicit here.
+The implementation comes from mirror-mirror commit history, including its Android
+revival patch, manifest rewrite, filesystem tools and kernel/Wi-Fi compatibility
+work. Exact source provenance is in [PROVENANCE.md](PROVENANCE.md).
 
 Android and Qualcomm source trees, licensed vendor components and kernel inputs
 are needed to build system. The original workstation's `.work` directory is not
@@ -14,6 +14,80 @@ camera captures or an image containing a previous owner's authorization. Build
 authorization for the receiving owner's public key. RSA authentication remains
 enabled; generic auto-authorization and unrestricted LAN ADB are not defaults.
 
-Until clean-checkout reconstruction and artifact provenance are verified, do not
-advertise a ready-to-flash public firmware release. The CLI and documentation
-can be used for inspection without any firmware download.
+## Source checkout
+
+`build/manifest.xml` pins 447 Android/Qualcomm projects to commit IDs and replaces
+retired CodeAurora endpoints with archival HTTPS mirrors. Check it with:
+
+```sh
+python3 tools/check-manifest.py
+```
+
+On a Linux case-sensitive filesystem, Google's `repo` tool can consume this repo
+as its manifest repository:
+
+```sh
+mkdir android-m && cd android-m
+repo init -u https://github.com/Onemoremichael/lulu-mirror-software-only.git \
+  -b main -m build/manifest.xml
+repo sync -c -j4
+```
+
+Expect a large download and a build workspace of at least 100 GiB; provision
+additional space for compiler output and caches. `repo sync` must complete with
+the exact revisions. An unavailable archived commit is a real dependency gap;
+do not silently substitute the tip of a repository.
+
+The manifest does **not** supply the proprietary Qualcomm HY22 vendor tree.
+Provide that from your lawfully obtained matching SDK/build inputs at
+`vendor/qcom/proprietary`, including `prebuilt_HY22` and the common vendor build
+files. Their source and redistribution rights must be established before a
+community firmware release. The pinned build container supplies the old host
+toolchain environment; it is not a substitute for these vendor inputs.
+
+## Build system and the matching Wi-Fi module
+
+The host needs Python 3.10+ and Docker. The container uses its existing Python 2.7
+for legacy Android preparation; `build/prepare.py` supports both interpreters.
+Build against a disposable source checkout:
+
+```sh
+python3 tools/build-system.py --tree /absolute/path/to/android-m \
+  --public-key "$HOME/.android/adbkey.pub" --output-dir artifacts/my-system
+```
+
+The source tree must be on a Linux-compatible, case-sensitive filesystem. A Linux
+Docker volume or ext4 working image avoids macOS filesystem incompatibilities.
+The build modifies that workspace and compiler output; use a disposable copy.
+
+For the existing ext4 legacy workspace, the tool makes a filesystem clone first:
+
+```sh
+python3 tools/build-system.py --legacy-image /absolute/path/to/old-build.ext4.img \
+  --work-image /absolute/path/to/new-working-build.img \
+  --public-key "$HOME/.android/adbkey.pub" --output-dir artifacts/my-system
+```
+
+APFS cloning on macOS or reflink support on Linux is required for this path. The
+tool refuses an existing working-image path and does not silently allocate a
+full physical copy. Docker needs privileged loop mounts for an ext4 image.
+`build.log` records compilation progress; `build-report.json` and `SHA256SUMS`
+identify successful output. `system.img` is the only firmware image exported.
+Building never invokes ADB or fastboot.
+
+The kernel is compiled to obtain compatible module symbols, but the device keeps
+its original kernel. The Wi-Fi module must match
+`3.10.49-perf-gf46dad5260f`. The Android patch supplies owner-key authorization,
+the userdata encryption-handoff fix, speaker routing and delayed WLAN loading.
+USB RSA authorization stays enabled; network ADB is disabled by default.
+
+The baseline does not add the camera lab's diagnostic kernel module, C2D sampler,
+exposure experiments, clock, assistant or dashboard. A clean generic vendor
+camera stack is **not** equivalent to the repaired research camera. Camera support
+must be migrated and measured before claiming parity with the original research
+image. A legacy workspace can retain camera source changes from that work; its
+build report must not be described as a clean-source reproduction.
+
+Until a clean-source build, vendor provenance and device acceptance are verified,
+there is no ready-to-flash public firmware release. Inspection, owner userdata
+creation and remote controls work independently of that release milestone.
