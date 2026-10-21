@@ -25,6 +25,11 @@ screenshots. Android may display the entered text; navigate carefully.
 For an iPhone on the same trusted Wi-Fi, bind to this computer's specific LAN
 address (find it in Network settings):
 
+The bind must be loopback or an explicit RFC1918 LAN IPv4 address (10/8,
+172.16/12 or 192.168/16). Wildcard `0.0.0.0`, public addresses and IPv6 are
+rejected before contacting Android. This restricts binding; it does not add
+authentication or make an untrusted LAN safe.
+
 ```sh
 python3 mirror.py remote --serial YOUR_SERIAL --board mir63a0-revp21 \
   --host YOUR_COMPUTERS_PRIVATE_IPV4
