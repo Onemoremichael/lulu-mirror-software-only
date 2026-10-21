@@ -1,5 +1,11 @@
 # Recovery guide
 
+**Scope:** the commands and boot-button observations below apply only to the
+documented `mir63a0-revp21` profile. They are not a universal Qualcomm or MIRROR
+unlock sequence. For another or unidentified combination, start with
+[hardware intake](../CONTRIBUTING.md) and the [porting strategy](PORTING.md).
+Never try this profile's writes to discover whether a different board works.
+
 1. Read the printed board label and check [compatibility](COMPATIBILITY.md).
 2. Run `python3 mirror.py doctor` and `python3 mirror.py devices`.
 3. If authorized Android ADB already works, inspect that installation first.

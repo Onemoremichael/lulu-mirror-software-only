@@ -4,6 +4,26 @@ Recover a discontinued lululemon Studio MIRROR as a usable Android computer on
 its original mainboard. The screen has no touch layer; setup and everyday
 control happen from your computer or phone.
 
+## Mission: every original-board MIRROR
+
+Our goal is a documented **software-only recovery path for every lululemon
+MIRROR hardware combination**, so any owner can unlock the useful potential of
+the hardware they already own. This is a community research program, not a claim
+that all chipsets are supported today or that every secure-boot configuration
+can be bypassed. We prefer retaining a working signed boot chain when possible;
+usable Android does not require an unlocked bootloader or unrestricted root.
+
+No replacement mainboard is the baseline. Software-only can still require
+physical access to internal USB or buttons; it does not mean a remote one-click
+unlock. Hardware modifications are a separate experimental path, not a hidden
+prerequisite for a software-only success claim.
+
+**Have a different board, or not sure what you have? You belong here.** Start
+with the [hardware registry](hardware/README.md) and
+[contributor guide](CONTRIBUTING.md). Report the board even if it is still locked,
+you cannot get ADB, or your only result is a failed attempt. Do not select our
+existing flash profile merely because your unit has a similar chipset.
+
 This project extracts the Android recovery work from
 [mirror-mirror](https://github.com/Onemoremichael/mirror-mirror). That repository
 keeps the hardware research and experimental applications. The separate
@@ -24,6 +44,9 @@ for the compatibility mechanisms and remaining acceptance checks.
 The supported hardware candidate is **MIR63A0-00-P1 / PCA#500240 RevP21**,
 Qualcomm APQ8016/MSM8916. Check the printed board label. Other revisions need
 their own evidence; a matching chipset alone is insufficient.
+This is our first research success, not the project's scope limit. See the
+[porting strategy](docs/PORTING.md) for how shared findings become separately
+verified recovery paths rather than copied firmware.
 
 Requirements: Python 3.10+ and Google's Android platform-tools (`adb`,
 `fastboot`) on your PATH. No Python packages are required.
@@ -31,6 +54,7 @@ Requirements: Python 3.10+ and Google's Android platform-tools (`adb`,
 ```sh
 python3 mirror.py doctor
 python3 mirror.py devices
+# Only after confirming the matching printed board label:
 python3 mirror.py inspect --serial YOUR_SERIAL --board mir63a0-revp21
 ```
 

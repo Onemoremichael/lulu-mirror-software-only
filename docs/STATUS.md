@@ -1,7 +1,11 @@
 # Verification status
 
-As of October 20, 2026, this repository is being extracted into a focused recovery
-project. Original hardware evidence is in
+As of October 20, 2026, the initial extraction is merged. The project's mission
+is software-only recovery across every original-board MIRROR combination; the
+table below describes only the evidence available today, not the scope of that
+mission. Other-board reports and investigations are welcome through the
+[hardware registry](../hardware/README.md) and [contributor guide](../CONTRIBUTING.md).
+Original hardware evidence is in
 [mirror-mirror's checkpoint](https://github.com/Onemoremichael/mirror-mirror/blob/main/RECOVERY-STATUS.md).
 
 | Requirement | Evidence / remaining work |

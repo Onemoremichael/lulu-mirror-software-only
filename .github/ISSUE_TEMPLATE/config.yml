@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Start here — hardware registry and contribution guide
+    url: https://github.com/Onemoremichael/lulu-mirror-software-only/blob/main/CONTRIBUTING.md
+    about: Identify your board, find related work, and learn what evidence is safe to share.

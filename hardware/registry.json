@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "boards": [
+    {
+      "id": "mir63a0-revp21",
+      "board_label": "MIR63A0-00-P1 / PCA#500240 RevP21",
+      "soc_family": "APQ8016 / MSM8916",
+      "evidence_level": "research-unit-recovered",
+      "record": "boards/mir63a0-revp21.md",
+      "recovery_profile": "mir63a0-revp21",
+      "repeatable_recovery": false
+    }
+  ]
+}
