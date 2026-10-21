@@ -45,9 +45,25 @@ with verification and remote control, without reflashing.
 Use the [owner acceptance checklist](docs/ACCEPTANCE.md) to distinguish automated
 Android checks from actual display, Wi-Fi, audio and camera tests.
 
+### Already have working Android?
+
+Migrating to these tools does **not** require replacing your installation. Start
+with the read-only check below; it does not change orientation, power state,
+settings or authorization. A pass describes the installed system, not an unflashed
+image built by this project.
+
 ```sh
-# Once Android ADB is authorized:
-python3 mirror.py configure --serial YOUR_SERIAL --board mir63a0-revp21
+python3 mirror.py verify --serial YOUR_SERIAL --board mir63a0-revp21 \
+  --output reports/existing-installation.json
+```
+
+Keep your current apps and settings. Skip `configure` unless you specifically
+want the setup changes described in the [control guide](docs/REMOTE.md).
+Starting the remote serves its control page; using its buttons can change the
+device, so it is separate from read-only verification.
+
+```sh
+# Optional controls, once Android ADB is authorized:
 python3 mirror.py remote --serial YOUR_SERIAL --board mir63a0-revp21
 ```
 
