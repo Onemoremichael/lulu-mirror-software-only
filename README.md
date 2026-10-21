@@ -24,6 +24,10 @@ with the [hardware registry](hardware/README.md) and
 you cannot get ADB, or your only result is a failed attempt. Do not select our
 existing flash profile merely because your unit has a similar chipset.
 
+We also maintain a [source-backed hardware research catalog](hardware/research/README.md)
+for specifications and leads not yet validated on our own units. It separates
+researched claims from locally verified observations and recovery support.
+
 This project extracts the Android recovery work from
 [mirror-mirror](https://github.com/Onemoremichael/mirror-mirror). That repository
 keeps the hardware research and experimental applications. The separate

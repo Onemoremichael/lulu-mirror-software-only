@@ -10,8 +10,10 @@ permissions, not a catalog of every board we want to support.
 | MIR63A0-00-P1 / PCA#500240 RevP21 | APQ8016 / MSM8916 | One unit recovered; original kernel 3.10.49-perf-gf46dad5260f |
 | All other or unidentified combinations | Unknown until reported and investigated | Welcome for intake; no flash profile |
 
-References to other chipset families (including i.MX8) are research leads, not
-verified board identities or supported recovery procedures in this repository.
+The [documentary catalog](../hardware/research/README.md) records external
+Qualcomm/NXP, panel and firmware evidence with claim-level sources. Those
+researched identities are not locally verified combinations or supported
+recovery procedures in this repository.
 Do not infer a board population from this table. Add evidence through a
 [board report](../CONTRIBUTING.md#1-report-your-hardware).
 

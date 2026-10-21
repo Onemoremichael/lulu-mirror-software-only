@@ -33,6 +33,11 @@ cross-cutting findings. Add attempts as linked updates. Avoid parallel folklore
 threads with no source revision or outcome. Contributors do not need to wait
 for a universal framework before reporting an inaccessible unit.
 
+Before same-unit validation, use the [documentary catalog](../hardware/research/README.md)
+for researched specifications and candidate relationships. Its claim-level
+evidence states are orthogonal to recovery progress; avoid manufacturing a full
+SoC-by-panel combination matrix from unrelated observations.
+
 ### Example transfer reasoning—not additional compatibility claims
 
 | Observation or shared part | What can transfer | What must be established on the receiving combination |

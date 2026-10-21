@@ -29,8 +29,9 @@ does not enable device writes.
 | Assistant/platform boundary | Looking Glass points recovery to the dedicated repo, without moving its optional wrapper | Looking Glass PR #25 merged; unrelated local app changes preserved |
 | Public firmware distribution | Provenance/license review and verified release artifacts | Pending; no release published |
 | Second-owner onboarding | Matching board recovers from published instructions | Pending |
-| Each pass pushed and merged | PR merge state plus detailed validation | New repo PRs #1–7, mirror-mirror PR #10 and Looking Glass PR #25 merged |
+| Each pass pushed and merged | PR merge state plus detailed validation | New repo PRs #1–8, mirror-mirror PR #10 and Looking Glass PR #25 merged |
 | Checkout provenance audit | Compare actual Git HEADs with all manifest pins | Host checkout matches 447/447; legacy Linux image lacks Git metadata; working-file/vendor contents remain unattested |
+| Documentary hardware landscape | Primary-source claim catalog with explicit research/verification boundaries | 24 researched claims, 12 entities, 19 source references; no new locally verified combination or write profile |
 
 The mirror later became reachable through USB, and the migrated inspection and
 verification commands passed all eight read-only checks on its **existing**

@@ -8,6 +8,11 @@ mission. Other-board reports and investigations are welcome through the
 Original hardware evidence is in
 [mirror-mirror's checkpoint](https://github.com/Onemoremichael/mirror-mirror/blob/main/RECOVERY-STATUS.md).
 
+The [documentary hardware catalog](../hardware/research/README.md) separately
+records external specifications, firmware/panel leads and source limitations.
+Those claims are researched, not newly verified on this project's hardware;
+they do not add recovery profiles or expand the table's runtime support.
+
 | Requirement | Evidence / remaining work |
 | --- | --- |
 | Usable Android 6.0.1 on original board | Verified on one RevP21 unit in September 2026 |
