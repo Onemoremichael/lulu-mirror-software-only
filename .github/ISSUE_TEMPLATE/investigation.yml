@@ -41,6 +41,11 @@ body:
     validations:
       required: true
   - type: textarea
+    id: documentary
+    attributes:
+      label: Documentary sources and claim status
+      description: For researched specifications, include primary URLs, precise sections/comments, access dates and source dependencies. Separate externally researched, inferred, locally observed and disputed facts. State what observation would validate each claim; no hardware ownership or test is required for desk research.
+  - type: textarea
     id: next
     attributes:
       label: Remaining blockers and next safe step

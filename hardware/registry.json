@@ -1,5 +1,6 @@
 {
   "schema": 1,
+  "research_catalog": "research/catalog.json",
   "boards": [
     {
       "id": "mir63a0-revp21",

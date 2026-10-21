@@ -21,6 +21,11 @@ records live here; executable write permissions live separately in `profiles/`.
 
 ## Current records
 
+For researched specifications before local hardware validation, see the
+[documentary research catalog](research/README.md). It separately tracks
+Qualcomm/NXP leads, panel/firmware identifiers and claim-level sources. Research
+entries are not new board-support records or enabled write profiles.
+
 | Record | Evidence level | Recovery profile | Important boundary |
 | --- | --- | --- | --- |
 | [MIR63A0-00-P1 / PCA#500240 RevP21](boards/mir63a0-revp21.md) | Research-unit recovered | `mir63a0-revp21` | One original research unit; extracted image not hardware-accepted; not a turnkey release |
@@ -32,6 +37,11 @@ not an invented board. Each record links its investigations, evidence and known
 gaps. A board can advance in one subsystem and remain blocked in another.
 
 ## Evidence levels
+
+These are **recovery progress** levels. They are separate from the research
+catalog's [specification evidence states](research/EVIDENCE.md): researched,
+verified-here and disputed. A well-sourced specification does not mean an unlock
+exists; a working recovery on one unit does not verify every reported component.
 
 1. **Reported:** an actual owner reports labels/state; identification incomplete.
 2. **Identified:** board/combination evidence reviewed, important unknowns listed.

@@ -6,6 +6,13 @@ verified success can move a hardware family forward. Our aim is software-only
 reuse of every original-board combination; current support is listed in the
 [hardware registry](hardware/README.md), not implied by that ambition.
 
+No unit of your own? Contribute documentary research through
+[the research catalog](hardware/research/README.md). Use its
+[claim/evidence rules](hardware/research/EVIDENCE.md) and the investigation issue
+form. Source-backed specifications can be recorded before implementation; they
+must stay distinct from same-unit observation and hardware acceptance. Do not
+invent an owner report or executable profile to add a researched lead.
+
 ## 1. Report your hardware
 
 Search [existing issues](https://github.com/Onemoremichael/lulu-mirror-software-only/issues)
