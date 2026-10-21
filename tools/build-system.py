@@ -77,8 +77,8 @@ def main():
                        'cloned legacy workspace; not a clean-source reproduction')
     else:
         tree = args.tree.resolve(strict=True)
-        command += ['--privileged', '-v', f'{tree}:/source']
-        source_kind = 'owner-supplied source checkout; verify against build/manifest.xml'
+        command += ['--privileged', '-e', 'SOURCE_REQUIRE_PINS=1', '-v', f'{tree}:/source']
+        source_kind = 'manifest HEAD-verified checkout; working-tree contents/vendor inputs not attested'
     output.mkdir(parents=True, exist_ok=False)
     inputs, camera_report = snapshot(ROOT, output, args.camera_artifacts)
     frozen_key = inputs / 'owner.pub'
@@ -100,11 +100,20 @@ def main():
         result = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT)
     if result.returncode:
         raise RuntimeError('Build failed; original input is preserved. Inspect ' + str(output / 'build.log'))
+    source_check = None
+    if args.tree:
+        source_check = json.loads((output / 'source-check.json').read_text())
+        if source_check.get('all_heads_match') is not True:
+            raise RuntimeError('Source checkout HEAD verification did not pass.')
+        source_check = {name: source_check[name] for name in
+                        ('projects', 'matching_heads', 'all_heads_match',
+                         'working_tree_contents_verified', 'vendor_inputs_verified')}
     image = output / 'system.img'
     report = {'schema': 1, 'profile': 'mir63a0-revp21', 'container': CONTAINER,
               'source_kind': source_kind, 'image': image_info(image), 'sha256': sha256(image),
               'owner_public_key_sha256': owner_key_hash, 'hardware_verified': False,
               'input_hashes': input_hashes,
+              'source_checkout': source_check,
               'camera': camera_report or 'Generic vendor stack only; camera recovery is not included in this baseline.'}
     write_json(output / 'build-report.json', report)
     print(json.dumps(report, indent=2))

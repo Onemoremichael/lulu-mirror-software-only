@@ -17,6 +17,10 @@ trap cleanup EXIT
 cd "$tree"
 test -s build/envsetup.sh
 test -s vendor/qcom/proprietary/prebuilt_HY22/Android.mk
+if [[ "${SOURCE_REQUIRE_PINS:-0}" = 1 ]]; then
+  python /inputs/source_inventory.py --tree "$tree" --manifest /inputs/manifest.xml \
+    --output /artifacts/source-check.json --require-pins
+fi
 python /inputs/prepare.py --tree "$tree" --public-key /owner.pub --inputs /inputs
 
 # Compile only a compatibility module for the existing stock kernel. Never export a boot image.

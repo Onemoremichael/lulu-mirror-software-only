@@ -131,3 +131,17 @@ platform/kernel, Android 6.0.1, boot completion, Launcher3, RSA authorization,
 in ignored `reports/` because it contains device identity. No setup command,
 power change, audio/camera capture or flash was performed. This is evidence for
 the migrated read-only tooling, not acceptance of the newly built image.
+
+The subsequent source inventory found all 447 manifest HEADs matching in the
+original host Android checkout. In the copied Linux legacy build image, all 447
+projects lacked accessible Git metadata; that is unavailable provenance, not
+evidence of 447 incorrect commits. A positive Git fixture passed with the pinned
+container's Python 2.7 and Git 1.7, independently checking old-tool compatibility.
+HEAD matching does not verify locally modified files or proprietary vendor
+inputs. New checkout-mode builds now enforce the inventory before preparation.
+
+The owner's priority is preserving the working mirror. Further migration audits
+remain host-side; no flash, reset, provisioning, reboot or replacement-image
+test is authorized by the ongoing migration. Any hardware-write phase requires
+a separately reviewed plan and explicit approval. The disposable-key test image
+must not replace the working installation.

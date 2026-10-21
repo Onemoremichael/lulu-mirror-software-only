@@ -38,6 +38,22 @@ additional space for compiler output and caches. `repo sync` must complete with
 the exact revisions. An unavailable archived commit is a real dependency gap;
 do not silently substitute the tip of a repository.
 
+Audit an existing checkout without modifying it or contacting the mirror:
+
+```sh
+mkdir -p reports
+python3 build/source_inventory.py --tree /absolute/path/to/android-m \
+  --manifest build/manifest.xml --output reports/source-check.json --require-pins
+```
+
+Use a new report filename on each run; existing reports are never overwritten.
+This compares each project's Git HEAD with the expanded, pinned manifest. It
+does not attest working-file contents, proprietary vendor inputs, or licensing.
+`build-system.py --tree` requires this check inside the Linux container before
+source preparation and records the result in `build-report.json`. Legacy-image
+and resume-image builds remain explicitly unverified legacy workspaces; they
+are not retroactively certified by a separate host checkout's audit.
+
 The manifest does **not** supply the proprietary Qualcomm HY22 vendor tree.
 Provide that from your lawfully obtained matching SDK/build inputs at
 `vendor/qcom/proprietary`, including `prebuilt_HY22` and the common vendor build
