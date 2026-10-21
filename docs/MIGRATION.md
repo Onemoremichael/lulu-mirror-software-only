@@ -20,10 +20,13 @@ experiments. Work is committed, pushed and merged in reviewable passes.
 | Assistant/platform boundary | Looking Glass points recovery to the dedicated repo, without moving its optional wrapper | Looking Glass PR #25 merged; unrelated local app changes preserved |
 | Public firmware distribution | Provenance/license review and verified release artifacts | Pending; no release published |
 | Second-owner onboarding | Matching board recovers from published instructions | Pending |
-| Each pass pushed and merged | PR merge state plus detailed validation | New repo PRs #1–4, mirror-mirror PR #10 and Looking Glass PR #25 merged |
+| Each pass pushed and merged | PR merge state plus detailed validation | New repo PRs #1–5, mirror-mirror PR #10 and Looking Glass PR #25 merged |
+| Checkout provenance audit | Compare actual Git HEADs with all manifest pins | Host checkout matches 447/447; legacy Linux image lacks Git metadata; working-file/vendor contents remain unattested |
 
 The mirror later became reachable through USB, and the migrated inspection and
 verification commands passed all eight read-only checks on its **existing**
 installation. The newly built image remains unflashed and physically untested.
 GitHub Actions cannot start because the account is billing-locked. These are
 distinct evidence boundaries, not support for a claim of new-image acceptance.
+The owner prioritizes preserving the current installation; hardware writes need
+separate explicit approval and are not part of the ongoing host-side audit.

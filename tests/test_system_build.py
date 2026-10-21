@@ -34,11 +34,15 @@ class SystemBuildTests(unittest.TestCase):
             (root / 'native/camera-report.json').write_text(json.dumps(camera))
             output = root / 'result'
             calls = []
+            pins_match = True
 
             def docker_run(command, **kwargs):
                 calls.append(command)
                 # Simulate output only; this is not a native/image acceptance test.
                 (output / 'system.img').write_bytes(b'mocked image')
+                (output / 'source-check.json').write_text(json.dumps({
+                    'projects': 447, 'matching_heads': 447 if pins_match else 0, 'all_heads_match': pins_match,
+                    'working_tree_contents_verified': False, 'vendor_inputs_verified': False}))
                 return subprocess.CompletedProcess(command, 0)
 
             arguments = ['build-system.py', '--tree', str(root / 'tree'),
@@ -58,10 +62,24 @@ class SystemBuildTests(unittest.TestCase):
                 self.assertIn(binding, command)
             self.assertIn('CAMERA_ENABLED=1', command)
             self.assertIn('BUILD_JOBS=2', command)
+            self.assertIn('SOURCE_REQUIRE_PINS=1', command)
             self.assertNotIn(str(key) + ':/owner.pub:ro', command)
             report = json.loads((output / 'build-report.json').read_text())
             self.assertEqual(report['camera'], camera)
             self.assertFalse(report['hardware_verified'])
+            self.assertTrue(report['source_checkout']['all_heads_match'])
+            self.assertFalse(report['source_checkout']['working_tree_contents_verified'])
             self.assertIn('camera-artifacts/mm-qcamera-daemon', report['input_hashes'])
             self.assertEqual(report['input_hashes'],
                              json.loads((output / 'input-hashes.json').read_text()))
+            # A nominal Docker success may not bypass the host-side pin gate.
+            output = root / 'rejected'
+            arguments[arguments.index('--output-dir') + 1] = str(output)
+            pins_match = False
+            with patch.dict(entry['main'].__globals__, {
+                'ROOT': root, 'image_info': lambda image: {'mocked': True}
+            }), patch('sys.argv', arguments), patch('subprocess.run', side_effect=docker_run), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                with self.assertRaisesRegex(RuntimeError, 'HEAD verification'):
+                    entry['main']()
+            self.assertFalse((output / 'build-report.json').exists())
