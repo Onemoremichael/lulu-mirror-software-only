@@ -44,6 +44,9 @@ For a fresh Linux source checkout, substitute `--source-tree /path/to/android-m`
 for `--source-image`. The tool can export kernel userspace headers into its
 temporary build directory without compiling a kernel. `--fresh-headers` forces
 that path for validation when a legacy workspace already has generated headers.
+The forced fresh-header path was tested on October 20 and produced the same four
+artifact hashes as the integrated image's camera inputs. A full fresh Android
+checkout/build is still a separate, unverified step.
 Run image-based build jobs sequentially; do not mount a workspace while another
 job is writing to it.
 Both build entry points use the same exclusive Docker container name and a

@@ -39,6 +39,12 @@ binaries or publish an owner's firmware dump. Review upstream terms when buildin
 or distributing derived artifacts. Tools and patches retain their source history
 and attribution through this table and the originating repository.
 
+The inspected legacy HY22 vendor directories contain no Git checkout metadata.
+Their directory names do not establish a repository origin, revision or
+redistribution permission. The successful legacy-workspace build must not be
+presented as a complete pinned-source reproduction. Supplying attributable,
+matching vendor inputs remains necessary for that claim.
+
 The Docker build environment originally used was
 `alleen/apq8016_bm@sha256:b1d5749735cd5e8c3a8915cbc2d06f4d74da62be1082534528da1e6b127fac6c`.
 An immutable digest establishes which image was used, not its trustworthiness or

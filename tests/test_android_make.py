@@ -5,6 +5,23 @@ import unittest
 
 
 class AndroidMakeTests(unittest.TestCase):
+    def test_error_trap_ignores_handled_subshell_probe_but_reports_fatal_errors(self):
+        recipe = Path(__file__).resolve().parent.parent / 'build/container-build.sh'
+        trap = next(line for line in recipe.read_text().splitlines() if line.startswith('trap '))
+        for body, fatal in [('probe() { local colors=$(false); }; probe; echo survived', False),
+                            ('false', True), ('result=$(false)', True)]:
+            with self.subTest(body=body):
+                result = subprocess.run(['bash', '-c', 'set -Eeuo pipefail\n' + trap + '\n' + body],
+                                        capture_output=True, text=True)
+                if fatal:
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn('Build step failed', result.stderr)
+                    self.assertIn('false', result.stderr)
+                else:
+                    self.assertEqual(result.returncode, 0)
+                    self.assertEqual(result.stderr, '')
+                    self.assertEqual(result.stdout.strip(), 'survived')
+
     def test_vendor_modules_get_relative_prepared_kernel_output(self):
         recipe = Path(__file__).resolve().parent.parent / 'build/android-make.sh'
         # Replace make with an argument-printing shell function. No compilation.

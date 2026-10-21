@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-trap 'echo "Build step failed at line $LINENO: $BASH_COMMAND" >&2' ERR
+trap 'if [[ $BASH_SUBSHELL = 0 ]]; then echo "Build step failed at line $LINENO: $BASH_COMMAND" >&2; fi' ERR
 # Invoked by tools/build-system.py in the pinned Linux build environment.
 tree=/source
 mounted=0
