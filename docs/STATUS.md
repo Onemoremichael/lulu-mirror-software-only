@@ -11,7 +11,7 @@ project. Original hardware evidence is in
 | Wi-Fi, speaker, microphone, ADB | Verified on original unit; second-owner validation needed |
 | Camera | Research image usable with dark/noisy image and intermittent startup limitations |
 | Clean-checkout recovery tools | Inspection, bundle verification, plan, explicit flash and Android verification implemented; host regression tests cover write boundaries |
-| Reproducible Android build | Pinned build inputs and owner-specific recipes extracted; complete image build and fresh-source reproduction still pending |
+| Reproducible Android build | Pinned recipes completed a legacy-workspace image build and filesystem inspection; fresh-source reproduction remains unverified |
 | Public firmware release | Not published; redistribution and owner authorization need review |
 | Second owner installation | Not yet verified |
 
@@ -80,3 +80,30 @@ The recipe now explicitly builds Launcher3, removes generated automatic
 recovery installers/payload before the final pack, and checks their absence
 inside the finished image. An ERR trap identifies any future failed shell gate.
 No candidate was flashed and no automatic updater was executed.
+
+## Successful host build — October 20, 2026
+
+The revised integrated build exited successfully. The sparse system image is
+855,546,960 bytes, expanding to 1,288,413,184 bytes, with SHA-256:
+
+```text
+6ea30e58069cdc9dde064198a66606abe19f39606f663f433c878fd2d9b5f2e9
+```
+
+Read-only filesystem checks passed: privileged Launcher3/Settings, vold handoff
+marker, Wi-Fi framework/module, speaker routing, camera artifact
+comparisons and front/mount-0 metadata, both software-recording libraries,
+Snapcam APK, absence of lab modules and automatic recovery updaters, and an empty
+ELF truncation audit. All 39 frozen input hashes and the exported sparse stream
+and hash were independently rechecked on the host.
+An independent inspection of that exported image also verified the intended
+owner fingerprint and authorization-branch marker in compiled `services.jar`.
+Future builds record this check in `owner-check.json`; it is not a live ADB
+authorization test.
+
+This was a resumed disposable **legacy workspace**, not a clean-source
+reproduction. It used a disposable test public key, not a community/default
+owner key. `hardware_verified` remains false. The image is an ignored local
+test artifact, not a public release or an instruction to flash an existing
+installation. Boot, camera quality and physical audio acceptance on this newly
+built image remain untested.

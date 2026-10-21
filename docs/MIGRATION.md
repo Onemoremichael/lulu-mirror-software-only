@@ -12,9 +12,9 @@ experiments. Work is committed, pushed and merged in reviewable passes.
 | Android-compatible userdata | Filesystem/labels/features/e2fsck and sparse expansion proof | Real 128 MiB host test passed |
 | Guided recovery | Validated artifacts, geometry checks, explicit write plan, failure handling | Implemented; mocked write-boundary tests passed |
 | Non-touch Android setup and control | Configure command and working remote controls | Implemented; HTTP tests passed; hardware acceptance pending |
-| Reproducible Android build | Pinned inputs, successful build and clean-checkout validation | Pinned sources/recipes extracted; legacy-workspace build under test |
+| Reproducible Android build | Pinned inputs, successful build and clean-checkout validation | Integrated legacy-workspace build and image checks passed; clean-source reproduction pending |
 | Wi-Fi/audio/camera parity | Physical acceptance with resulting image | Original research evidence exists; new baseline not yet accepted |
-| Camera compatibility extraction | Minimal native code, source patches, ABI and buffer-safety checks | Extracted and host/native-tested; integrated image build under test |
+| Camera compatibility extraction | Minimal native code, source patches, ABI and buffer-safety checks | Native/host tests and integrated filesystem checks passed; physical acceptance pending |
 | Upstream repo pivot | Main README and ownership links point to new recovery repo | mirror-mirror PR #10 merged |
 | Assistant/platform boundary | Looking Glass points recovery to the dedicated repo, without moving its optional wrapper | Looking Glass PR #25 merged; unrelated local app changes preserved |
 | Public firmware distribution | Provenance/license review and verified release artifacts | Pending; no release published |

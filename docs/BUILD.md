@@ -92,6 +92,9 @@ rejects shared objects whose ELF tables, file-backed sections or segments extend
 past the file. This is a truncation check, not proof of symbol resolution or
 hardware behavior. A failed build retains its log; no failed artifact is
 automatically deleted or retried.
+`owner-check.json` verifies the fingerprint derived from the supplied public key
+and the owner-authorization marker in the compiled services DEX. It does not
+claim that a live device accepted the key; retain the separate hardware check.
 Launcher3 is selected explicitly because the Qualcomm product otherwise omits
 it. The final pack removes generated `bin/install-recovery.sh`,
 `etc/install-recovery.sh` and `recovery-from-boot.p`, and rejects any of those
@@ -136,8 +139,9 @@ camera stack is **not** equivalent to the repaired research camera. Supplying
 `--camera-artifacts` validates and freezes the four native camera files, applies
 the HAL/Snapcam/recording source fixes, builds both recording architectures, and
 checks installed files and metadata in the finished filesystem. Full integrated
-image compilation and hardware acceptance are still under test; this is not yet
-proof of camera parity. A legacy workspace can retain source changes from that work; its
+image compilation and filesystem inspection passed on the disposable legacy
+workspace on October 20; hardware acceptance remains untested. This is not yet
+proof of camera parity or a clean-source build. A legacy workspace can retain source changes from that work; its
 build report must not be described as a clean-source reproduction.
 
 Until a clean-source build, vendor provenance and device acceptance are verified,

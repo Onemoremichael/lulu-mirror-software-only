@@ -64,8 +64,9 @@ Use the image clone/resume options in [BUILD.md](../docs/BUILD.md) instead of
 only its four required binaries into an immutable per-build snapshot. It applies
 the HAL/Snapcam/recording source fixes, builds both recording architectures, then
 checks native file hashes, front/mount-0 metadata, buffer-bound guards and the
-camera APK in the final filesystem. This integrated path is under build test;
-none of these filesystem checks constitutes physical camera acceptance.
+camera APK in the final filesystem. The integrated legacy-workspace build and
+these checks passed on October 20; none constitutes physical camera acceptance
+or clean-source reproduction. See the exact image hash in [STATUS.md](../docs/STATUS.md).
 
 Camera source preparation runs inside the pinned Linux environment with GNU
 patch. macOS BSD patch does not handle some of the historical one-line hunks the

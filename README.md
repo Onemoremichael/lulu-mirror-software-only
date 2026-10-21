@@ -15,8 +15,8 @@ Wi-Fi, speakers and microphone while retaining its original signed bootloader,
 boot image, kernel, recovery and board firmware. Camera preview, photos and
 software-encoded video work on the research image, with brightness and startup
 limitations. This does not establish a bootloader unlock or unrestricted root.
-The extracted build pipeline is still under validation; it is not yet a
-hardware-accepted replacement image. See the [camera migration](camera/README.md)
+The extracted pipeline has passed a local legacy-workspace build and filesystem
+inspection, but has not produced a hardware-accepted replacement release. See the [camera migration](camera/README.md)
 for the compatibility mechanisms and remaining acceptance checks.
 
 ## Start here

@@ -4,6 +4,7 @@ grep -qx 'ro.mirror.software_only=1' /inspect/build.prop
 # Launcher3 is a privileged Android system app in this product.
 test -s /inspect/priv-app/Launcher3/Launcher3.apk
 test -s /inspect/priv-app/Settings/Settings.apk
+python /inputs/check-owner.py --system /inspect --public-key /owner.pub > /artifacts/owner-check.json
 grep -a -q 'Mirror revival: started Android with unencrypted userdata' /inspect/bin/vold
 test -s /inspect/framework/wifi-service.jar
 test -s /inspect/lib/modules/pronto/pronto_wlan.ko
