@@ -15,6 +15,22 @@ Migrated source utilities:
 | build/android-revival.patch.in | patches/android-m-mirror-revival.patch | Owner fingerprint placeholder; omit LAN ADB and verbose camera properties |
 | build/kernel.config | artifacts/.../running-kernel-build.config | Observed kernel configuration for compatibility build; original kernel remains on device |
 | build/manifest.xml | .work/android-m/.repo/manifests/advan/LA.BR.1.2.7-01010-8x16.0-github.xml | Pinned Android/Qualcomm checkout manifest |
+| camera/isp-compat.c | camera/legacy-camera-compat.c | Keep ISP ABI translation and missing fixed-focus hooks; remove exposure, diagnostics and ioctl logging |
+| camera/quectel-ov5640-*.patch and camera/mirror-ov5640-stock-modes.patch | camera/ with the same filenames | Sensor ABI and default mode/timing fixes, without runtime timing sweeps |
+| camera/mirror-camera-*.patch | camera/ with the same filenames | Front/mount-0 metadata and raw software video; omit startup exposure experiment |
+| camera/mirror-snapcam-*.patch | camera/ with the same filenames | Portrait preview/photo/video and bounded software-video bitrate |
+| camera/mirror-codec-video-pack.patch and camera/mirror-video-pack.h | camera/ with the same filenames | Bounded NV12 Venus-to-packed recording conversion |
+| camera/test-video-pack.cpp | camera/test-video-pack.cpp | Host sanitizer regression for the recording buffer layout |
+
+The sensor source comes from the owner-supplied
+`copslock/Quectel_sc20_linux_sdk` checkout at
+`ed0e50a102c7ee115c6999ba0a26ce50537c616e`; its redistribution terms must be
+reviewed separately. `tools/build-camera.py` requires this revision and exact
+hashes of the two HY22 vendor inputs before binary modification. Build reports
+record output hashes; those checks identify supported inputs, not permission to
+redistribute the outputs. The minimal shim has not yet been accepted on a newly
+built recovery image and is not equivalent to the exposure-enabled research
+checkpoint.
 
 Android framework and platform source retain their upstream licenses. Qualcomm
 vendor components have separate terms. Kernel/module source has its upstream

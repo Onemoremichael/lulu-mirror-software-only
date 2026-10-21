@@ -95,3 +95,5 @@ sequence and leave a journal; there is no automatic retry or reboot. Verificatio
 checks boot, Android version, launcher, display, userdata, Wi-Fi driver and RSA
 ADB configuration. Cold boot, saved Wi-Fi reconnection, Internet, audible speaker
 output, microphone quality and camera quality still require physical acceptance.
+Record those separately with the [acceptance checklist](ACCEPTANCE.md); an
+automated report must not turn untested physical behavior into a pass.

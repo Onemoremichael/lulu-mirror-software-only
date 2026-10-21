@@ -15,6 +15,9 @@ Wi-Fi, speakers and microphone while retaining its original signed bootloader,
 boot image, kernel, recovery and board firmware. Camera preview, photos and
 software-encoded video work on the research image, with brightness and startup
 limitations. This does not establish a bootloader unlock or unrestricted root.
+The extracted pipeline has passed a local legacy-workspace build and filesystem
+inspection, but has not produced a hardware-accepted replacement release. See the [camera migration](camera/README.md)
+for the compatibility mechanisms and remaining acceptance checks.
 
 ## Start here
 
@@ -39,6 +42,8 @@ Follow [the recovery guide](docs/RECOVERY.md),
 [hardware compatibility](docs/COMPATIBILITY.md) and
 [what is verified](docs/STATUS.md). Existing Android installations should start
 with verification and remote control, without reflashing.
+Use the [owner acceptance checklist](docs/ACCEPTANCE.md) to distinguish automated
+Android checks from actual display, Wi-Fi, audio and camera tests.
 
 ```sh
 # Once Android ADB is authorized:

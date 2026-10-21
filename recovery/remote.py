@@ -13,6 +13,17 @@ KEYS = {'back': 4, 'home': 3, 'recents': 187, 'up': 19, 'down': 20,
         'volume-up': 24, 'volume-down': 25, 'wake': 224, 'sleep': 223}
 APPS = {'settings': 'android.settings.SETTINGS',
         'wifi': 'android.settings.WIFI_SETTINGS'}
+LAN_NETWORKS = tuple(ipaddress.IPv4Network(value) for value in
+                     ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'))
+
+
+def validate_host(host):
+    try:
+        address = ipaddress.IPv4Address(host)
+    except (ipaddress.AddressValueError, TypeError):
+        raise RecoveryError('Choose an explicit loopback or private-LAN IPv4 address.') from None
+    if not address.is_loopback and not any(address in network for network in LAN_NETWORKS):
+        raise RecoveryError('Choose an explicit loopback or private-LAN IPv4 address; wildcard/public binds are disabled.')
 
 
 def action(serial, body):
@@ -42,11 +53,10 @@ def action(serial, body):
 
 
 def make_server(serial, board, host='127.0.0.1', port=8765):
+    validate_host(host)
     identity = inspect(serial, board)
     if identity['transport'] != 'adb' or not identity['compatible']:
         raise RecoveryError('Connect the compatible Mirror through authorized ADB first.')
-    if not ipaddress.ip_address(host).is_private or ':' in host:
-        raise RecoveryError('Choose an explicit private IPv4 address or 127.0.0.1.')
     allowed_hosts = set()
     assets = {'/': ('index.html', 'text/html'), '/app.js': ('app.js', 'text/javascript'),
               '/style.css': ('style.css', 'text/css')}
