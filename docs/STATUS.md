@@ -69,3 +69,14 @@ vendor bus-timeout fault-injection module but hit its own forbidden compiler
 warning. These generic kernel test modules are outside normal recovery operation;
 the vendor's `TARGET_KERNEL_DLKM_DISABLE` hook now disables them. The required
 stock-compatible Wi-Fi module remains an explicit, verified build/install step.
+
+With that hook disabled, actual Android compilation and image packing completed.
+Read-only inspection independently passed the camera binary comparisons,
+front/mount-0 metadata, 32/64-bit recording guards, Wi-Fi module, speaker route,
+vold marker and ELF audit. The candidate was nevertheless rejected: Launcher3
+was absent from Qualcomm's default product selection, and the generated
+`install-recovery.sh`/recovery patch violated the preserved-recovery boundary.
+The recipe now explicitly builds Launcher3, removes generated automatic
+recovery installers/payload before the final pack, and checks their absence
+inside the finished image. An ERR trap identifies any future failed shell gate.
+No candidate was flashed and no automatic updater was executed.

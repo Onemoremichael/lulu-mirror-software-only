@@ -13,5 +13,6 @@ jobs:
       - run: python3 tools/check-manifest.py
       - run: bash -n build/container-build.sh
       - run: bash -n build/android-make.sh
+      - run: bash -n build/recovery-boundary.sh
       - run: bash -n build/camera-native.sh build/camera-stage.sh
       - run: python3 tools/check-camera.py

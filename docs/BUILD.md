@@ -92,6 +92,11 @@ rejects shared objects whose ELF tables, file-backed sections or segments extend
 past the file. This is a truncation check, not proof of symbol resolution or
 hardware behavior. A failed build retains its log; no failed artifact is
 automatically deleted or retried.
+Launcher3 is selected explicitly because the Qualcomm product otherwise omits
+it. The final pack removes generated `bin/install-recovery.sh`,
+`etc/install-recovery.sh` and `recovery-from-boot.p`, and rejects any of those
+paths in the completed filesystem. Preserving recovery requires removing this
+boot-time updater as well as keeping recovery out of host flash commands.
 Each new invocation freezes its recipes and owner public key under the ignored
 output directory's `inputs/`, and writes `input-hashes.json` before starting
 Docker. Editing the repository then cannot alter that invocation's recipes.

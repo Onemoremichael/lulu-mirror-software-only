@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
+trap 'echo "Build step failed at line $LINENO: $BASH_COMMAND" >&2' ERR
 # Invoked by tools/build-system.py in the pinned Linux build environment.
 tree=/source
 mounted=0
@@ -52,7 +53,9 @@ if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then
   prepare_camera_sources
   camera_targets=(camera.msm8916_32 libstagefright libstagefright_32 SnapdragonCamera)
 fi
-android_make systemimage "${camera_targets[@]}"
+# Qualcomm's product omits an ordinary launcher from its default package list.
+# Build/install it explicitly; the final no-dependencies pack includes it.
+android_make systemimage Launcher3 "${camera_targets[@]}"
 install -m 0644 "$wlan/wlan.ko" "$product/system/lib/modules/pronto/pronto_wlan.ko"
 # The original product doesn't include the camera media controller modules in its
 # package list; retain the vendor components needed by its installed daemon.
@@ -71,6 +74,9 @@ rm -f "$product/system/lib/modules/mirror_camera_diag.ko" "$product/system/vendo
 sed -i '/^persist.camera.*debug/d; /^debug.mirror./d; /^service.adb.tcp.port=/d; /^ro.mirror.software_only=/d' "$product/system/build.prop"
 printf '\nservice.adb.tcp.port=-1\nro.mirror.software_only=1\n' >> "$product/system/build.prop"
 if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then install_camera_artifacts; fi
+source /inputs/recovery-boundary.sh
+remove_recovery_update "$product/system"
+assert_no_recovery_update "$product/system"
 android_make snod
 cp "$product/system.img" /artifacts/system.img
 cp "$wlan/wlan.ko" /artifacts/pronto_wlan.ko
@@ -83,6 +89,7 @@ mkdir -p /inspect
 mount -o loop,ro /artifacts/system.raw.img /inspect
 trap 'umount /inspect; cleanup' EXIT
 source /inputs/inspect-system.sh
+assert_no_recovery_update /inspect
 if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then verify_camera_image; fi
 python /inputs/elf.py /inspect > /artifacts/elf-audit.json
 umount /inspect
