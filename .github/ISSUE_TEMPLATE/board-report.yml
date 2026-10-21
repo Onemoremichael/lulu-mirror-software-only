@@ -1,0 +1,65 @@
+name: Board identification and progress report
+description: Report any MIRROR board, including locked or unidentified units. No flash or coding required.
+title: "[Board report] printed board label or unknown"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Welcome! Search existing issues for your exact PCB/PCA label first. If the combination already has an investigation, add your independent observations there and link this report if needed. Unknown is a useful answer. Do not flash or modify hardware to fill out this form.
+
+        This is public: remove serials, MAC/IP addresses, owner keys, account/Wi-Fi secrets, room reflections and personal paths. No raw firmware/userdata or full getprop/getvar dumps. Redact photos locally before attaching. Reporting a board does not enable a recovery profile.
+  - type: input
+    id: board
+    attributes:
+      label: Printed mainboard / PCA label and revision
+      description: Transcribe exactly, or say unknown/not safely accessible. Do not include serial numbers.
+    validations:
+      required: true
+  - type: textarea
+    id: identity
+    attributes:
+      label: Identity evidence and related reports
+      description: Redacted PCB photos or existing issue links; visible SoC/storage markings if known. Separate observed facts from guesses. External product name alone is not a board ID.
+    validations:
+      required: true
+  - type: dropdown
+    id: state
+    attributes:
+      label: Current observed state
+      options:
+        - Unknown / cannot access
+        - Stock MIRROR app
+        - Working recovered Android
+        - Recovery / update screen
+        - Fastboot detected
+        - Other / describe below
+    validations:
+      required: true
+  - type: textarea
+    id: access
+    attributes:
+      label: Connection and software observations
+      description: Host OS/tool versions, USB setup, whether ADB is authorized/unauthorized/missing, fastboot detected/not detected, firmware/kernel if already known. Share only redacted excerpts. No need to enable a new mode or select the RevP21 profile.
+    validations:
+      required: true
+  - type: textarea
+    id: attempts
+    attributes:
+      label: Attempts, results and current condition
+      description: None is fine. Otherwise include dates, starting state, redacted commands, source revisions/artifact hashes, expected/observed outcome, failures and resulting state. Say whether each attempt read, built, wrote or physically modified anything. Keep stock/working installations unchanged without explicit owner consent.
+    validations:
+      required: true
+  - type: textarea
+    id: variation
+    attributes:
+      label: Components, variants and open questions
+      description: Panel, camera, audio, radio or storage details already visible/known; differences from linked boards; what help you want. Unknown is fine. Do not remove shields or probe powered electronics for this report.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before posting
+      options:
+        - label: I reviewed text and attachments for identifiers, keys, secrets and personal imagery; no raw firmware/userdata is attached.
+          required: true
+        - label: I understand this is evidence intake, not a claim my board supports the existing recovery image or write profile.
+          required: true

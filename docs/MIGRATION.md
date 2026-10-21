@@ -4,6 +4,15 @@ Objective: make original-board Android recovery a focused, repeatable community
 project, separate from optional assistant/dashboard/clock applications and lab
 experiments. Work is committed, pushed and merged in reviewable passes.
 
+The broader project mission is software-only recovery for every original-board
+MIRROR hardware combination. The first extraction establishes one researched
+path; it is not a universal firmware image. Community reports, component-aware
+shared findings and independently reviewed paths are organized through the
+[hardware registry](../hardware/README.md), [contribution guide](../CONTRIBUTING.md)
+and [porting strategy](PORTING.md). Other-board research does not need to wait
+for completion of the first path's release gates, and adding a research record
+does not enable device writes.
+
 | Deliverable | Proof required | Current state |
 | --- | --- | --- |
 | Dedicated public repo and local checkout | GitHub main and clean local checkout | Created at the requested name/path |
@@ -20,7 +29,7 @@ experiments. Work is committed, pushed and merged in reviewable passes.
 | Assistant/platform boundary | Looking Glass points recovery to the dedicated repo, without moving its optional wrapper | Looking Glass PR #25 merged; unrelated local app changes preserved |
 | Public firmware distribution | Provenance/license review and verified release artifacts | Pending; no release published |
 | Second-owner onboarding | Matching board recovers from published instructions | Pending |
-| Each pass pushed and merged | PR merge state plus detailed validation | New repo PRs #1–6, mirror-mirror PR #10 and Looking Glass PR #25 merged |
+| Each pass pushed and merged | PR merge state plus detailed validation | New repo PRs #1–7, mirror-mirror PR #10 and Looking Glass PR #25 merged |
 | Checkout provenance audit | Compare actual Git HEADs with all manifest pins | Host checkout matches 447/447; legacy Linux image lacks Git metadata; working-file/vendor contents remain unattested |
 
 The mirror later became reachable through USB, and the migrated inspection and

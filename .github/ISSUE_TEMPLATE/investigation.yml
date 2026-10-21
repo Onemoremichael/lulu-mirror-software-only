@@ -1,0 +1,49 @@
+name: Recovery investigation or shared finding
+description: Track a scoped access/build/driver effort, failure, or reusable finding across combinations.
+title: "[Investigation] mechanism or question"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Link board reports rather than assuming compatibility from a chipset name. Report failures as well as successes. No issue authorizes a device write. Keep keys, serials, network identifiers, private dumps and room recordings out of this public thread.
+  - type: textarea
+    id: scope
+    attributes:
+      label: Exact combinations and existing investigations
+      description: Link registry records/intake issues. Identify what is observed, owner-reported, inferred or unknown. If the finding is shared, list which combinations were actually tested.
+    validations:
+      required: true
+  - type: dropdown
+    id: method
+    attributes:
+      label: Evidence from this effort
+      options:
+        - Hypothesis / source review only
+        - Read-only device observation
+        - Host-side build or test
+        - Approved device-write attempt
+        - Physical runtime acceptance
+        - Mixed — distinguish each result below
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction and observed outcome
+      description: Starting state, date, exact source revision/artifact hash, redacted commands, expected/actual result, resulting state and logs limited to relevant safe excerpts. Include failed attempts. For writes, document owner approval and reviewed boundaries; do not request speculative writes from others.
+    validations:
+      required: true
+  - type: textarea
+    id: applicability
+    attributes:
+      label: Reuse hypothesis and disproof test
+      description: Which mechanism or component is shared? What prerequisites must hold? Which other boards might benefit, and what test would show the finding does not transfer? Separate measured applicability from speculation.
+    validations:
+      required: true
+  - type: textarea
+    id: next
+    attributes:
+      label: Remaining blockers and next safe step
+      description: Unknowns, needed sources/rights/expertise, negative evidence, preservation/backup limitations and proposed next observation. Successful compilation is not hardware acceptance.
+    validations:
+      required: true
