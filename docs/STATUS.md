@@ -33,8 +33,8 @@ Camera migration: minimal sensor/ISP compatibility, checked vendor binary
 corrections, HAL metadata, portrait preview/photo/video and padded-video packing
 sources have been extracted. Native ARM ABI compilation, clean-source patch
 application/idempotence and host sanitizer tests passed. Camera artifact reports
-are hash-checked before consumption. Full firmware integration and hardware
-acceptance remain pending; see [camera compatibility](../camera/README.md).
+are hash-checked before consumption. Integrated firmware passed the host checks
+recorded below; hardware acceptance remains pending. See [camera compatibility](../camera/README.md).
 
 Docker crashed during two concurrent emulated builds. After user approval, only
 the disposable Android working copy was resumed, capped at two CPU cores and
@@ -107,3 +107,27 @@ owner key. `hardware_verified` remains false. The image is an ignored local
 test artifact, not a public release or an instruction to flash an existing
 installation. Boot, camera quality and physical audio acceptance on this newly
 built image remain untested.
+
+The separate `--fresh-headers` native camera test also completed under the
+two-core/4 GiB limit. It exported kernel userspace headers into an empty temporary
+output directory rather than using the legacy workspace's generated headers.
+All four output hashes matched the camera artifacts in the successful system
+image. This validates that header-export path, not an entire clean Android build.
+
+Source-provenance inspection found no Git checkout metadata in the legacy
+`vendor/qcom/proprietary` or `prebuilt_HY22` directories. No vendor repository
+origin or revision is inferred from that directory name. The full clean-source
+build and attributable matching vendor inputs therefore remain separate work.
+
+Build diagnostics now suppress the handled `tput colors` subshell probe that
+looked like a build failure in the successful log. Regression tests still
+require nonzero status and diagnostics for real failures and failing command
+substitutions. This changes reporting, not the inspected firmware payload.
+
+Later on October 20, the migrated `inspect` and `verify` commands ran over USB
+against the existing installation. All eight automated checks passed: matching
+platform/kernel, Android 6.0.1, boot completion, Launcher3, RSA authorization,
+1080p display, mounted userdata and loaded Wi-Fi driver. The local report stays
+in ignored `reports/` because it contains device identity. No setup command,
+power change, audio/camera capture or flash was performed. This is evidence for
+the migrated read-only tooling, not acceptance of the newly built image.
