@@ -31,6 +31,8 @@ def prepare(tree, key, inputs):
         with io.open(path, encoding='utf-8') as f:
             return f.read()
     def write(path, text):
+        if os.path.exists(path) and read(path) == text:
+            return
         with io.open(path, 'w', encoding='utf-8') as f:
             f.write(text)
     owner = fingerprint(key)
@@ -89,6 +91,19 @@ def prepare(tree, key, inputs):
     text = re.sub(r'\n# Mirror revival: expose read-only CSI diagnostics for camera bring-up\.\nif .*?\nfi\n',
                   '\n', text, flags=re.S)
     write(post, text)
+    # Fix GNU sed 4.2.2 bug#13179 (umask(0700) before mkstemp) inside the disposable
+    # build container so sed -i works on macOS VirtioFS mounts as well as native ext4.
+    if os.path.exists('/inputs/container-build.sh') and os.path.exists('/bin/sed'):
+        try:
+            with io.open('/bin/sed', 'r+b') as f:
+                data = f.read()
+                old = b'\xbf\xc0\x01\x00\x00\xe8\xb3\x91\xff\xff'
+                new = b'\xbf\x3f\x00\x00\x00\xe8\xb3\x91\xff\xff'
+                if old in data:
+                    f.seek(0)
+                    f.write(data.replace(old, new, 1))
+        except IOError:
+            pass
     return owner
 
 

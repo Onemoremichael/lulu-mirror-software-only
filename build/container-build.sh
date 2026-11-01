@@ -24,18 +24,24 @@ fi
 python /inputs/prepare.py --tree "$tree" --public-key /owner.pub --inputs /inputs
 
 # Compile only a compatibility module for the existing stock kernel. Never export a boot image.
+target_kernel="${KERNEL_RELEASE:-3.10.49-perf-gf46dad5260f}"
+localversion="${target_kernel#3.10.49}"
+if [[ "$localversion" == "$target_kernel" ]]; then
+  echo "Unexpected KERNEL_RELEASE prefix: $target_kernel" >&2
+  exit 1
+fi
 kernel_out="$tree/out/kernel-software-only"
 mkdir -p "$kernel_out"
 cp /inputs/kernel.config "$kernel_out/.config"
 kernel/scripts/config --file "$kernel_out/.config" \
-  --set-str LOCALVERSION '-perf-gf46dad5260f' --disable LOCALVERSION_AUTO
+  --set-str LOCALVERSION "$localversion" --disable LOCALVERSION_AUTO
 cross="$tree/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
 make -C kernel O="$kernel_out" ARCH=arm64 CROSS_COMPILE="$cross" olddefconfig
 make -C kernel O="$kernel_out" -j"${BUILD_JOBS:-4}" ARCH=arm64 CROSS_COMPILE="$cross"
 wlan="$tree/vendor/qcom/opensource/wlan/prima"
 make -C kernel O="$kernel_out" -j"${BUILD_JOBS:-4}" ARCH=arm64 CROSS_COMPILE="$cross" \
   M="$wlan" WLAN_ROOT="$wlan" MODNAME=wlan BOARD_PLATFORM=msm8916 CONFIG_PRONTO_WLAN=m modules
-modinfo "$wlan/wlan.ko" | grep -q '3.10.49-perf-gf46dad5260f'
+modinfo "$wlan/wlan.ko" | grep -qF "$target_kernel "
 
 export USE_CCACHE=1
 export CCACHE_DIR="$tree/.ccache"
@@ -59,10 +65,12 @@ if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then
 fi
 # Qualcomm's product omits an ordinary launcher from its default package list.
 # Build/install it explicitly; the final no-dependencies pack includes it.
-android_make systemimage Launcher3 "${camera_targets[@]}"
-install -m 0644 "$wlan/wlan.ko" "$product/system/lib/modules/pronto/pronto_wlan.ko"
+android_make systemimage Launcher3 ${camera_targets[@]+"${camera_targets[@]}"}
+install -D -m 0644 "$wlan/wlan.ko" "$product/system/lib/modules/pronto/pronto_wlan.ko"
+ln -sf /system/lib/modules/pronto/pronto_wlan.ko "$product/system/lib/modules/wlan.ko"
 # The original product doesn't include the camera media controller modules in its
 # package list; retain the vendor components needed by its installed daemon.
+install -d "$product/system/vendor/lib"
 vendor=vendor/qcom/proprietary/prebuilt_HY22/target/product/msm8916_64/system/vendor/lib
 for module in stats iface isp sensor pproc imglib c2d cpp vpe wnr; do
   if [[ -s "$vendor/libmmcamera2_${module}_modules.so" ]]; then
@@ -88,15 +96,15 @@ cp "$product/system/build.prop" /artifacts/build.prop
 sha256sum /artifacts/system.img /artifacts/pronto_wlan.ko > /artifacts/SHA256SUMS
 
 # Inspect the built filesystem, rather than accepting make's exit code alone.
-out/host/linux-x86/bin/simg2img /artifacts/system.img /artifacts/system.raw.img
+out/host/linux-x86/bin/simg2img /artifacts/system.img out/system.raw.img
 mkdir -p /inspect
-mount -o loop,ro /artifacts/system.raw.img /inspect
-trap 'umount /inspect; cleanup' EXIT
+mount -o loop,ro out/system.raw.img /inspect
+trap 'umount /inspect; rm -f "$tree/out/system.raw.img"; cleanup' EXIT
 source /inputs/inspect-system.sh
 assert_no_recovery_update /inspect
 if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then verify_camera_image; fi
 python /inputs/elf.py /inspect > /artifacts/elf-audit.json
 umount /inspect
 trap cleanup EXIT
-rm -f /artifacts/system.raw.img
+rm -f out/system.raw.img
 echo 'System image built and filesystem checks passed. No device was accessed.'
