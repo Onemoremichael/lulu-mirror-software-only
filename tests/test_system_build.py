@@ -105,3 +105,7 @@ class SystemBuildTests(unittest.TestCase):
             with patch('sys.argv', args_bad), contextlib.redirect_stderr(io.StringIO()):
                 with self.assertRaises(SystemExit):
                     entry['main']()
+
+        recipe = (Path(__file__).resolve().parent.parent / 'build/container-build.sh').read_text()
+        self.assertIn('LOCALVERSION= olddefconfig', recipe)
+        self.assertIn('LOCALVERSION= \\\n  M="$wlan"', recipe)

@@ -36,10 +36,10 @@ cp /inputs/kernel.config "$kernel_out/.config"
 kernel/scripts/config --file "$kernel_out/.config" \
   --set-str LOCALVERSION "$localversion" --disable LOCALVERSION_AUTO
 cross="$tree/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-"
-make -C kernel O="$kernel_out" ARCH=arm64 CROSS_COMPILE="$cross" olddefconfig
-make -C kernel O="$kernel_out" -j"${BUILD_JOBS:-4}" ARCH=arm64 CROSS_COMPILE="$cross"
+make -C kernel O="$kernel_out" ARCH=arm64 CROSS_COMPILE="$cross" LOCALVERSION= olddefconfig
+make -C kernel O="$kernel_out" -j"${BUILD_JOBS:-4}" ARCH=arm64 CROSS_COMPILE="$cross" LOCALVERSION=
 wlan="$tree/vendor/qcom/opensource/wlan/prima"
-make -C kernel O="$kernel_out" -j"${BUILD_JOBS:-4}" ARCH=arm64 CROSS_COMPILE="$cross" \
+make -C kernel O="$kernel_out" -j"${BUILD_JOBS:-4}" ARCH=arm64 CROSS_COMPILE="$cross" LOCALVERSION= \
   M="$wlan" WLAN_ROOT="$wlan" MODNAME=wlan BOARD_PLATFORM=msm8916 CONFIG_PRONTO_WLAN=m modules
 modinfo "$wlan/wlan.ko" | grep -qF "$target_kernel "
 
