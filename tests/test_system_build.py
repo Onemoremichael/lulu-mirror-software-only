@@ -62,9 +62,11 @@ class SystemBuildTests(unittest.TestCase):
                 self.assertIn(binding, command)
             self.assertIn('CAMERA_ENABLED=1', command)
             self.assertIn('BUILD_JOBS=2', command)
+            self.assertIn('KERNEL_RELEASE=3.10.49-perf-gf46dad5260f', command)
             self.assertIn('SOURCE_REQUIRE_PINS=1', command)
             self.assertNotIn(str(key) + ':/owner.pub:ro', command)
             report = json.loads((output / 'build-report.json').read_text())
+            self.assertEqual(report['kernel_release'], '3.10.49-perf-gf46dad5260f')
             self.assertEqual(report['camera'], camera)
             self.assertFalse(report['hardware_verified'])
             self.assertTrue(report['source_checkout']['all_heads_match'])
@@ -83,3 +85,45 @@ class SystemBuildTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'HEAD verification'):
                     entry['main']()
             self.assertFalse((output / 'build-report.json').exists())
+
+            # Documented 1.19.1 RevP21 kernel release passes; unknown release is rejected.
+            pins_match = True
+            output = root / 'result-119'
+            args_119 = ['build-system.py', '--tree', str(root / 'tree'),
+                        '--public-key', str(key), '--output-dir', str(output),
+                        '--kernel-release', '3.10.49-perf-g6ef738a5ced']
+            with patch.dict(entry['main'].__globals__, {
+                'ROOT': root, 'image_info': lambda image: {'mocked': True}
+            }), patch('sys.argv', args_119), patch('subprocess.run', side_effect=docker_run), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                entry['main']()
+            self.assertIn('KERNEL_RELEASE=3.10.49-perf-g6ef738a5ced', calls[-1])
+
+            args_bad = ['build-system.py', '--tree', str(root / 'tree'),
+                        '--public-key', str(key), '--output-dir', str(root / 'bad-kernel'),
+                        '--kernel-release', '3.10.49-perf-gdeadbeef']
+            with patch('sys.argv', args_bad), contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit):
+                    entry['main']()
+
+        recipe = (Path(__file__).resolve().parent.parent / 'build/container-build.sh').read_text()
+        self.assertIn('LOCALVERSION= olddefconfig', recipe)
+        self.assertIn('LOCALVERSION= \\\n  M="$wlan"', recipe)
+        self.assertIn('ro.mirror.gpio_backlight=1', recipe)
+        self.assertIn('ro.qualcomm.cabl=0', recipe)
+        self.assertIn('service.adb.tcp.port=-1', recipe)
+
+        inspect_script = (Path(__file__).resolve().parent.parent / 'build/inspect-system.sh').read_text()
+        self.assertIn("grep -qx 'service.adb.tcp.port=-1' /inspect/build.prop", inspect_script)
+        self.assertIn("grep -qx 'ro.mirror.gpio_backlight=1' /inspect/build.prop", inspect_script)
+        self.assertIn("grep -qx 'ro.qualcomm.cabl=0' /inspect/build.prop", inspect_script)
+
+        patch_template = (Path(__file__).resolve().parent.parent / 'build/android-revival.patch.in').read_text()
+        self.assertIn('MIRROR_PANEL_ENABLE_GPIO', patch_template)
+        self.assertIn('/sys/class/gpio/gpio1000/value', patch_template)
+
+        prepare_script = (Path(__file__).resolve().parent.parent / 'build/prepare.py').read_text()
+        self.assertIn("'service.adb.tcp.port=-1'", prepare_script)
+        self.assertIn("'ro.mirror.gpio_backlight=1'", prepare_script)
+        self.assertIn("'ro.qualcomm.cabl=0'", prepare_script)
+        self.assertIn('DEC1 Volume', prepare_script)

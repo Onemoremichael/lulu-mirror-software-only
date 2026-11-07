@@ -105,8 +105,9 @@ def inspect(serial, board):
                 'ro.adb.secure', 'sys.boot_completed', 'ro.crypto.state']
         result['properties'] = {k: adb(serial, 'shell', 'getprop', k) for k in keys}
         result['kernel'] = adb(serial, 'shell', 'uname', '-r')
+        allowed_kernels = config.get('kernel_releases', [config['kernel_release']])
         result['compatible'] = (result['properties']['ro.board.platform'] in config['platforms']
-                                and result['kernel'] == config['kernel_release'])
+                                and result['kernel'] in allowed_kernels)
     else:
         result['variables'] = {k: getvar(serial, k) for k in
                                ['product', 'secure', 'unlocked', 'max-download-size',

@@ -14,6 +14,7 @@ from build.prepare import fingerprint
 from build.resources import docker_build_command
 from build.inputs import snapshot
 from recovery.artifacts import image_info, sha256, write_json
+from recovery.device import profile
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTAINER = 'alleen/apq8016_bm@sha256:b1d5749735cd5e8c3a8915cbc2d06f4d74da62be1082534528da1e6b127fac6c'
@@ -30,8 +31,15 @@ def main():
     p.add_argument('--output-dir', type=Path, required=True)
     p.add_argument('--camera-artifacts', type=Path,
                    help='Hash-validated output directory from tools/build-camera.py')
+    p.add_argument('--kernel-release',
+                   help='Allowed RevP21 stock kernel release for pronto_wlan.ko vermagic')
     p.add_argument('--jobs', type=int, default=2)
     args = p.parse_args()
+    board_profile = profile('mir63a0-revp21')
+    allowed_kernels = board_profile.get('kernel_releases', [board_profile['kernel_release']])
+    kernel_release = args.kernel_release or board_profile['kernel_release']
+    if kernel_release not in allowed_kernels:
+        p.error('Unsupported --kernel-release; allowed: ' + ', '.join(allowed_kernels))
     key = args.public_key.resolve(strict=True)
     if key.suffix != '.pub':
         p.error('Use only the ADB .pub public key.')
@@ -43,7 +51,9 @@ def main():
     if output.exists():
         p.error('Choose a new output directory so previous build logs/artifacts are preserved.')
     command = docker_build_command() + [
-               '-e', f'BUILD_JOBS={args.jobs}', '-v', f'{output}:/artifacts']
+               '-e', f'BUILD_JOBS={args.jobs}',
+               '-e', f'KERNEL_RELEASE={kernel_release}',
+               '-v', f'{output}:/artifacts']
     if args.legacy_image or args.resume_image:
         original = args.legacy_image.resolve(strict=True) if args.legacy_image else None
         if args.resume_image:
@@ -110,6 +120,7 @@ def main():
                          'working_tree_contents_verified', 'vendor_inputs_verified')}
     image = output / 'system.img'
     report = {'schema': 1, 'profile': 'mir63a0-revp21', 'container': CONTAINER,
+              'kernel_release': kernel_release,
               'source_kind': source_kind, 'image': image_info(image), 'sha256': sha256(image),
               'owner_public_key_sha256': owner_key_hash, 'hardware_verified': False,
               'input_hashes': input_hashes,
