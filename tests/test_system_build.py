@@ -109,3 +109,21 @@ class SystemBuildTests(unittest.TestCase):
         recipe = (Path(__file__).resolve().parent.parent / 'build/container-build.sh').read_text()
         self.assertIn('LOCALVERSION= olddefconfig', recipe)
         self.assertIn('LOCALVERSION= \\\n  M="$wlan"', recipe)
+        self.assertIn('ro.mirror.gpio_backlight=1', recipe)
+        self.assertIn('ro.qualcomm.cabl=0', recipe)
+        self.assertIn('service.adb.tcp.port=-1', recipe)
+
+        inspect_script = (Path(__file__).resolve().parent.parent / 'build/inspect-system.sh').read_text()
+        self.assertIn("grep -qx 'service.adb.tcp.port=-1' /inspect/build.prop", inspect_script)
+        self.assertIn("grep -qx 'ro.mirror.gpio_backlight=1' /inspect/build.prop", inspect_script)
+        self.assertIn("grep -qx 'ro.qualcomm.cabl=0' /inspect/build.prop", inspect_script)
+
+        patch_template = (Path(__file__).resolve().parent.parent / 'build/android-revival.patch.in').read_text()
+        self.assertIn('MIRROR_PANEL_ENABLE_GPIO', patch_template)
+        self.assertIn('/sys/class/gpio/gpio1000/value', patch_template)
+
+        prepare_script = (Path(__file__).resolve().parent.parent / 'build/prepare.py').read_text()
+        self.assertIn("'service.adb.tcp.port=-1'", prepare_script)
+        self.assertIn("'ro.mirror.gpio_backlight=1'", prepare_script)
+        self.assertIn("'ro.qualcomm.cabl=0'", prepare_script)
+        self.assertIn('DEC1 Volume', prepare_script)

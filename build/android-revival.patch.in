@@ -179,3 +179,52 @@ index 8a951fe..9a9d37a 100644
                  case CMD_START_AP:
                      if (mWifiNative.loadDriver() == false) {
                          loge("Failed to load driver for softap");
+diff --git a/frameworks/base/services/core/java/com/android/server/lights/LightsService.java b/frameworks/base/services/core/java/com/android/server/lights/LightsService.java
+index ed884ef..1996d3a 100644
+--- a/frameworks/base/services/core/java/com/android/server/lights/LightsService.java
++++ b/frameworks/base/services/core/java/com/android/server/lights/LightsService.java
+@@ -24,9 +24,28 @@ import android.os.Message;
+ import android.os.Trace;
+ import android.util.Slog;
+ 
++import java.io.File;
++import java.io.FileOutputStream;
++
+ public class LightsService extends SystemService {
+     static final String TAG = "LightsService";
+     static final boolean DEBUG = false;
++    private static final File MIRROR_PANEL_ENABLE_GPIO =
++            new File("/sys/class/gpio/gpio1000/value");
++    private static int sLastMirrorPanelEnable = -1;
++
++    private static void setMirrorPanelBacklightEnable(boolean enable) {
++        int target = enable ? 1 : 0;
++        if (sLastMirrorPanelEnable == target || !MIRROR_PANEL_ENABLE_GPIO.exists()) {
++            return;
++        }
++        try (FileOutputStream out = new FileOutputStream(MIRROR_PANEL_ENABLE_GPIO)) {
++            out.write(enable ? new byte[]{'1', '\n'} : new byte[]{'0', '\n'});
++            sLastMirrorPanelEnable = target;
++        } catch (Exception e) {
++            Slog.w(TAG, "Unable to update Mirror panel backlight GPIO", e);
++        }
++    }
+ 
+     final LightImpl mLights[] = new LightImpl[LightsManager.LIGHT_ID_COUNT];
+ 
+@@ -104,7 +123,15 @@ public class LightsService extends SystemService {
+                 Trace.traceBegin(Trace.TRACE_TAG_POWER, "setLight(" + mId + ", 0x"
+                         + Integer.toHexString(color) + ")");
+                 try {
++                    boolean backlightOn = mId == LightsManager.LIGHT_ID_BACKLIGHT
++                            && (color & 0x00ffffff) != 0;
++                    if (backlightOn) {
++                        setMirrorPanelBacklightEnable(true);
++                    }
+                     setLight_native(mNativePointer, mId, color, mode, onMS, offMS, brightnessMode);
++                    if (mId == LightsManager.LIGHT_ID_BACKLIGHT && !backlightOn) {
++                        setMirrorPanelBacklightEnable(false);
++                    }
+                 } finally {
+                     Trace.traceEnd(Trace.TRACE_TAG_POWER);
+                 }

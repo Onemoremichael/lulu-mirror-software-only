@@ -64,8 +64,8 @@ if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then
   camera_targets=(camera.msm8916_32 libstagefright libstagefright_32 SnapdragonCamera)
 fi
 # Qualcomm's product omits an ordinary launcher from its default package list.
-# Build/install it explicitly; the final no-dependencies pack includes it.
-android_make systemimage Launcher3 ${camera_targets[@]+"${camera_targets[@]}"}
+# Build/install it and services explicitly; the final no-dependencies pack includes them.
+android_make systemimage services Launcher3 ${camera_targets[@]+"${camera_targets[@]}"}
 install -D -m 0644 "$wlan/wlan.ko" "$product/system/lib/modules/pronto/pronto_wlan.ko"
 ln -sf /system/lib/modules/pronto/pronto_wlan.ko "$product/system/lib/modules/wlan.ko"
 # The original product doesn't include the camera media controller modules in its
@@ -83,8 +83,8 @@ for module in stats iface isp sensor pproc imglib c2d cpp vpe wnr; do
 done
 # Remove known lab-only generated files from a migrated output tree.
 rm -f "$product/system/lib/modules/mirror_camera_diag.ko" "$product/system/vendor/lib/libMD2.so"
-sed -i '/^persist.camera.*debug/d; /^debug.mirror./d; /^service.adb.tcp.port=/d; /^ro.mirror.software_only=/d' "$product/system/build.prop"
-printf '\nservice.adb.tcp.port=-1\nro.mirror.software_only=1\n' >> "$product/system/build.prop"
+sed -i '/^persist.camera.*debug/d; /^debug.mirror./d; /^service.adb.tcp.port=/d; /^ro.mirror.software_only=/d; /^ro.mirror.gpio_backlight=/d; /^ro.qualcomm.cabl=/d' "$product/system/build.prop"
+printf '\nservice.adb.tcp.port=-1\nro.mirror.software_only=1\nro.mirror.gpio_backlight=1\nro.qualcomm.cabl=0\n' >> "$product/system/build.prop"
 if [[ "${CAMERA_ENABLED:-0}" = 1 ]]; then install_camera_artifacts; fi
 source /inputs/recovery-boundary.sh
 remove_recovery_update "$product/system"

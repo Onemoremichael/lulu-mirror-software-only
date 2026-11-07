@@ -40,7 +40,8 @@ def prepare(tree, key, inputs):
     markers = {'frameworks/base/services/usb/java/com/android/server/usb/UsbDebuggingManager.java': 'MIRROR_OWNER_ADB_FINGERPRINT',
                'system/vold/cryptfs.c': 'mirror_revival_mount_unencrypted_data',
                'device/qcom/msm8916_32/mixer_paths_sbc.xml': 'The MIRROR\'s AUDIO-HDR',
-               'frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java': 'DRIVER_LOAD_RETRY_TRIES'}
+               'frameworks/opt/net/wifi/service/java/com/android/server/wifi/WifiStateMachine.java': 'DRIVER_LOAD_RETRY_TRIES',
+               'frameworks/base/services/core/java/com/android/server/lights/LightsService.java': 'MIRROR_PANEL_ENABLE_GPIO'}
     changes = []
     # Preflight all components first. A failed later hunk must not leave a newly
     # half-patched workspace that a subsequent marker check would mistake for ready.
@@ -77,13 +78,35 @@ def prepare(tree, key, inputs):
             if count != 1:
                 raise ValueError('Could not replace the previous owner fingerprint.')
             write(target, text)
+    # Apply far-field gain on voice-rec-mic idempotently so both clean and
+    # already-prepared source checkouts gain +10 dB DEC1 digital capture headroom.
+    mixer = os.path.join(tree, 'device/qcom/msm8916_32/mixer_paths_sbc.xml')
+    mixer_text = read(mixer)
+    stock_voice_rec = (
+        '    <path name="voice-rec-mic">\n'
+        '        <path name="handset-mic" />\n'
+        '    </path>'
+    )
+    far_field_voice_rec = (
+        '    <path name="voice-rec-mic">\n'
+        '        <!-- Far-field boost for wall-mounted MIRROR chassis mic -->\n'
+        '        <path name="handset-mic" />\n'
+        '        <ctl name="ADC1 Volume" value="7" />\n'
+        '        <ctl name="DEC1 Volume" value="94" />\n'
+        '    </path>'
+    )
+    if 'Far-field boost for wall-mounted MIRROR chassis mic' not in mixer_text:
+        if stock_voice_rec not in mixer_text:
+            raise ValueError('Could not locate voice-rec-mic path in mixer_paths_sbc.xml')
+        write(mixer, mixer_text.replace(stock_voice_rec, far_field_voice_rec, 1))
     # Keep a clear development identity and USB control. Network ADB is opt-in at runtime.
     properties = os.path.join(tree, 'device/qcom/msm8916_64/system.prop')
     text = read(properties)
     lines = [line for line in text.splitlines() if not re.match(
-        r'^(service\.adb\.tcp\.port|ro\.mirror\.software_only|persist\.camera\..*debug.*|debug\.mirror\.)=', line)]
+        r'^(service\.adb\.tcp\.port|ro\.mirror\.software_only|ro\.mirror\.gpio_backlight|ro\.qualcomm\.cabl|persist\.camera\..*debug.*|debug\.mirror\.)=', line)]
     lines.extend(['', '# Original-board MIRROR software recovery',
-                  'service.adb.tcp.port=-1', 'ro.mirror.software_only=1'])
+                  'service.adb.tcp.port=-1', 'ro.mirror.software_only=1',
+                  'ro.mirror.gpio_backlight=1', 'ro.qualcomm.cabl=0'])
     write(properties, '\n'.join(lines) + '\n')
     # A migrated workspace may contain lab-only post-boot probes. Strip the named block.
     post = os.path.join(tree, 'device/qcom/common/rootdir/etc/init.qcom.post_boot.sh')

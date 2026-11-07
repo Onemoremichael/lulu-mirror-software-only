@@ -1,6 +1,9 @@
 # Sourced with the completed image mounted read-only at /inspect.
 grep -qx 'service.adb.tcp.port=-1' /inspect/build.prop
 grep -qx 'ro.mirror.software_only=1' /inspect/build.prop
+grep -qx 'ro.mirror.gpio_backlight=1' /inspect/build.prop
+grep -qx 'ro.qualcomm.cabl=0' /inspect/build.prop
+test -s /inspect/framework/services.jar
 # Launcher3 is a privileged Android system app in this product.
 test -s /inspect/priv-app/Launcher3/Launcher3.apk
 test -s /inspect/priv-app/Settings/Settings.apk
